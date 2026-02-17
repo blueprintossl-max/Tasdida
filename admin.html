@@ -3,114 +3,81 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لوحة التحكم المالية | تسديدة محترف</title>
+    <title>تقارير العمولات | تسديدة محترف</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root { --primary: #059669; --secondary: #2563eb; --dark: #0f172a; }
-        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #f1f5f9; padding: 20px; margin: 0; }
-        .container { max-width: 1200px; margin: 0 auto; background: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); display: none; }
+        :root { --primary: #059669; --dark: #0f172a; --gold: #fbbf24; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #f8fafc; margin: 0; padding: 20px; }
+        .container { max-width: 1000px; margin: 0 auto; background: white; padding: 25px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); display: none; }
         
-        /* أيقونة إجمالي الدخل العائمة */
-        .floating-total {
-            position: fixed; bottom: 30px; left: 30px; 
+        /* أيقونة مجموع الدخل الكلي العائمة */
+        .grand-total-box {
+            position: fixed; top: 20px; left: 20px; 
             background: var(--dark); color: white; padding: 15px 25px; 
-            border-radius: 50px; box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-            display: flex; align-items: center; gap: 15px; z-index: 1000;
-            border: 2px solid var(--primary); transition: 0.3s;
+            border-radius: 15px; box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+            z-index: 1000; border-left: 5px solid var(--gold);
         }
-        .floating-total i { font-size: 24px; color: #fbbf24; }
-        .floating-total .amount { font-size: 20px; font-weight: 900; }
+        .grand-total-box span { font-size: 12px; display: block; opacity: 0.8; }
+        .grand-total-box b { font-size: 22px; color: var(--gold); }
 
-        .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; border-bottom: 2px solid #f1f5f9; padding-bottom: 15px; }
-        .brand-admin { font-size: 24px; font-weight: 900; color: #0f172a; }
-
-        /* تقارير الملاعب المنفصلة */
-        .stadium-reports-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 15px; margin-bottom: 30px; }
-        .stadium-stat-card { background: white; border: 1px solid #e2e8f0; padding: 15px; border-radius: 12px; position: relative; }
-        .stadium-stat-card h4 { margin: 0 0 10px 0; color: var(--dark); border-bottom: 1px solid #eee; padding-bottom: 5px; }
-        .stadium-stat-card .val { display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 14px; }
-        .stadium-stat-card .val b { color: var(--primary); }
-
-        .btn-action { border: none; padding: 10px 15px; border-radius: 8px; cursor: pointer; font-weight: bold; display: flex; align-items: center; gap: 8px; font-size: 14px; }
-        .btn-settings { background: var(--dark); color: white; }
-        .btn-danger { background: #ef4444; color: white; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
         
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th { background: #f8fafc; padding: 12px; text-align: right; border-bottom: 2px solid #e2e8f0; }
-        td { padding: 12px; border-bottom: 1px solid #f1f5f9; }
+        /* شبكة تقارير العمولات حسب الملاعب */
+        .commission-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+        .stadium-card { 
+            background: #fff; border: 2px solid #f1f5f9; padding: 20px; border-radius: 15px; 
+            transition: 0.3s; position: relative; overflow: hidden;
+        }
+        .stadium-card:hover { border-color: var(--primary); transform: translateY(-5px); }
+        .stadium-card h3 { margin: 0 0 15px 0; color: var(--dark); display: flex; align-items: center; gap: 10px; }
+        
+        .stat-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px dashed #eee; }
+        .stat-row:last-child { border-bottom: none; }
+        .stat-row span { color: #64748b; font-size: 14px; }
+        .stat-row b { font-size: 16px; }
 
-        #loginScreen { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: var(--dark); display: flex; align-items: center; justify-content: center; z-index: 999; }
-        .login-box { background: white; padding: 40px; border-radius: 15px; text-align: center; width: 320px; }
+        .btn { padding: 10px 20px; border: none; border-radius: 10px; cursor: pointer; font-weight: bold; }
+        .btn-refresh { background: var(--primary); color: white; }
+
+        /* شاشة الدخول */
+        #loginScreen { position: fixed; inset: 0; background: var(--dark); display: flex; align-items: center; justify-content: center; z-index: 9999; }
+        .login-box { background: white; padding: 40px; border-radius: 20px; width: 300px; text-align: center; }
+        input { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
     </style>
 </head>
 <body>
 
-    <div class="floating-total" id="floatingGrandTotal">
-        <i class="fas fa-sack-dollar"></i>
-        <div>
-            <div style="font-size: 10px; opacity: 0.8;">إجمالي دخل النظام</div>
-            <div class="amount" id="grandTotalVal">0 ريال</div>
-        </div>
+    <div class="grand-total-box" id="grandTotalUI">
+        <span>إجمالي الدخل الكلي (حتى الآن):</span>
+        <b id="totalIncomeVal">0 ريال</b>
     </div>
 
     <div id="loginScreen">
         <div class="login-box">
-            <h2 style="margin:0;"><i class="fas fa-user-shield"></i> تسديدة محترف</h2>
-            <p style="color:#666; margin-bottom:20px;">إدارة ملاعب العارضة</p>
-            <input type="password" id="passInput" placeholder="كلمة المرور" style="width:100%; padding:12px; margin-bottom:15px; border-radius:8px; border:1px solid #ddd;">
-            <button onclick="login()" style="width:100%; padding:12px; background:var(--primary); color:white; border:none; border-radius:8px; cursor:pointer; font-weight:bold;">دخول</button>
-            <p id="loginError" style="color:red; font-size:12px; margin-top:10px;"></p>
+            <h2 style="margin:0;">تسديدة محترف</h2>
+            <p>لوحة تقارير العمولات</p>
+            <input type="password" id="passInput" placeholder="كلمة المرور">
+            <button class="btn btn-refresh" style="width:100%;" onclick="login()">فتح التقارير</button>
         </div>
     </div>
 
     <div class="container" id="dashboard">
-        <div class="top-bar">
-            <div class="brand-admin"><i class="fas fa-chart-line"></i> تقارير الملاعب المخصصة</div>
-            <div style="display:flex; gap:10px;">
-                <button class="btn-action btn-settings" onclick="openSettings()"><i class="fas fa-cog"></i> الإعدادات</button>
-                <button class="btn-action btn-danger" onclick="clearData()"><i class="fas fa-trash-alt"></i> تصفير</button>
-            </div>
+        <div class="header">
+            <h2><i class="fas fa-percentage" style="color:var(--primary);"></i> توزيع العمولات حسب الملاعب</h2>
+            <button class="btn btn-refresh" onclick="loadReports()"><i class="fas fa-sync"></i> تحديث</button>
         </div>
 
-        <h3 style="margin-bottom:15px;"><i class="fas fa-stadium"></i> ملخص الدخل والعمولة لكل ملعب:</h3>
-        <div id="stadiumReportsGrid" class="stadium-reports-grid">
+        <div id="stadiumReports" class="commission-grid">
             </div>
 
-        <hr style="border:0; border-top:1px solid #eee; margin:30px 0;">
-
-        <h3><i class="fas fa-list"></i> تفاصيل الحجوزات الأخيرة:</h3>
-        <div style="overflow-x:auto;">
-            <table>
-                <thead>
-                    <tr>
-                        <th>الكابتن</th>
-                        <th>الملعب</th>
-                        <th>التاريخ/الوقت</th>
-                        <th>الدخل</th>
-                        <th>العمولة</th>
-                        <th>إجراء</th>
-                    </tr>
-                </thead>
-                <tbody id="tableBody"></tbody>
-            </table>
+        <div style="margin-top: 40px; text-align: center; color: #94a3b8; font-size: 12px;">
+            جميع التقارير تعتمد على نسبة العمولة المحددة في الإعدادات.
         </div>
-    </div>
-
-    <div id="settingsModal" style="display:none; position:fixed; top:15%; left:50%; transform:translate(-50%,0); background:white; padding:30px; border-radius:15px; box-shadow:0 10px 30px rgba(0,0,0,0.2); z-index:1001; width:350px;">
-        <h3>⚙️ إعدادات الإدارة</h3>
-        <label>نسبة العمولة (%):</label>
-        <input type="number" id="commissionInput" style="width:100%; padding:10px; margin:10px 0;">
-        <label>رقم الواتساب:</label>
-        <input type="text" id="waSet" style="width:100%; padding:10px; margin:10px 0;">
-        <label>كلمة المرور:</label>
-        <input type="text" id="passSet" style="width:100%; padding:10px; margin:10px 0;">
-        <button onclick="saveConfig()" style="width:100%; padding:12px; background:var(--primary); color:white; border:none; border-radius:8px; cursor:pointer;">حفظ</button>
-        <button onclick="document.getElementById('settingsModal').style.display='none'" style="width:100%; padding:12px; margin-top:5px; background:#eee; border:none; border-radius:8px; cursor:pointer;">إلغاء</button>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, getDocs, deleteDoc, doc, setDoc, getDoc, writeBatch } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, collection, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         // كود الربط الخاص بك
         const firebaseConfig = {
@@ -125,115 +92,72 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
-        let realPass = "123";
-        let commRate = 10;
+        let commissionRate = 10; // القيمة الافتراضية
 
         window.login = async function() {
-            const val = document.getElementById('passInput').value;
+            const pass = document.getElementById('passInput').value;
             const snap = await getDoc(doc(db, "settings", "config"));
-            if(snap.exists()) {
-                realPass = snap.data().adminPassword || "123";
-                commRate = Number(snap.data().commission) || 10;
-            }
-            if(val === realPass) {
-                document.getElementById('loginScreen').style.display='none';
-                document.getElementById('dashboard').style.display='block';
-                loadData();
-            } else { document.getElementById('loginError').innerText="خطأ!"; }
+            const realPass = snap.exists() ? snap.data().adminPassword : "123";
+            commissionRate = snap.exists() ? Number(snap.data().commission) : 10;
+
+            if(pass === realPass) {
+                document.getElementById('loginScreen').style.display = 'none';
+                document.getElementById('dashboard').style.display = 'block';
+                loadReports();
+            } else { alert("كلمة المرور خاطئة!"); }
         }
 
-        window.loadData = async function() {
-            const tbody = document.getElementById('tableBody');
-            const grid = document.getElementById('stadiumReportsGrid');
-            tbody.innerHTML = '<tr><td colspan="6">جاري التحميل...</td></tr>';
-            
+        window.loadReports = async function() {
+            const container = document.getElementById('stadiumReports');
+            container.innerHTML = '<p>جاري جلب التقارير المالية...</p>';
+
             try {
                 const snap = await getDocs(collection(db, "bookings"));
-                let stadiumStats = {}; // لتخزين بيانات كل ملعب
-                let grandTotal = 0;
-                let rows = [];
+                let stadiumData = {};
+                let totalIncome = 0;
 
                 snap.forEach(d => {
-                    let data = d.data();
-                    data.id = d.id;
-                    rows.push(data);
-
-                    const sName = data.stadiumName || "غير محدد";
+                    const data = d.data();
+                    const sName = data.stadiumName || "ملعب غير معروف";
                     const price = Number(data.price) || 0;
-                    grandTotal += price;
 
-                    if(!stadiumStats[sName]) {
-                        stadiumStats[sName] = { income: 0, count: 0 };
+                    totalIncome += price;
+
+                    if(!stadiumData[sName]) {
+                        stadiumData[sName] = { total: 0, count: 0 };
                     }
-                    stadiumStats[sName].income += price;
-                    stadiumStats[sName].count += 1;
+                    stadiumData[sName].total += price;
+                    stadiumData[sName].count += 1;
                 });
 
-                // 1. تحديث الأيقونة العائمة
-                document.getElementById('grandTotalVal').innerText = grandTotal + " ريال";
+                // تحديث إجمالي الدخل التراكمي
+                document.getElementById('totalIncomeVal').innerText = totalIncome + " ريال";
 
-                // 2. تحديث شبكة تقارير الملاعب المنفصلة
-                grid.innerHTML = '';
-                for (const [name, stats] of Object.entries(stadiumStats)) {
-                    const commission = stats.income * (commRate / 100);
-                    grid.innerHTML += `
-                        <div class="stadium-stat-card">
-                            <h4><i class="fas fa-stadium"></i> ${name}</h4>
-                            <div class="val">دخل الملعب: <b>${stats.income} ريال</b></div>
-                            <div class="val">عمولتك (${commRate}%): <b style="color:var(--secondary)">${commission.toFixed(1)} ريال</b></div>
-                            <div class="val">عدد الحجوزات: <b>${stats.count}</b></div>
+                // رسم التقارير
+                container.innerHTML = '';
+                for (const [name, stats] of Object.entries(stadiumData)) {
+                    const stadiumComm = stats.total * (commissionRate / 100);
+                    
+                    container.innerHTML += `
+                        <div class="stadium-card">
+                            <h3><i class="fas fa-stadium"></i> ${name}</h3>
+                            <div class="stat-row">
+                                <span>إجمالي دخل الملعب:</span>
+                                <b>${stats.total} ريال</b>
+                            </div>
+                            <div class="stat-row">
+                                <span>العمولة المحصلة (${commissionRate}%):</span>
+                                <b style="color:var(--primary)">${stadiumComm.toFixed(2)} ريال</b>
+                            </div>
+                            <div class="stat-row">
+                                <span>عدد الحجوزات الناجحة:</span>
+                                <b>${stats.count} حجز</b>
+                            </div>
                         </div>
                     `;
                 }
 
-                // 3. تحديث الجدول الرئيسي
-                tbody.innerHTML = '';
-                rows.sort((a,b) => new Date(b.date) - new Date(a.date));
-                rows.forEach(item => {
-                    const rowComm = (Number(item.price) || 0) * (commRate / 100);
-                    tbody.innerHTML += `
-                        <tr>
-                            <td><b>${item.clientName}</b></td>
-                            <td>${item.stadiumName}</td>
-                            <td>${item.date}<br><small>${item.timeDisplay || item.time || ''}</small></td>
-                            <td>${item.price} ريال</td>
-                            <td style="color:var(--secondary); font-weight:bold;">${rowComm.toFixed(1)}</td>
-                            <td><button onclick="del('${item.id}')" style="background:none; border:none; color:red; cursor:pointer;"><i class="fas fa-trash"></i></button></td>
-                        </tr>
-                    `;
-                });
-
-            } catch(e) { console.error(e); }
-        }
-
-        window.del = async function(id) { if(confirm("حذف؟")) { await deleteDoc(doc(db, "bookings", id)); loadData(); } }
-        
-        window.clearData = async function() {
-            if(confirm("⚠️ سيتم حذف جميع الحجوزات وتصفير التقارير نهائياً!")) {
-                const batch = writeBatch(db);
-                const q = await getDocs(collection(db, "bookings"));
-                q.forEach(d => batch.delete(d.ref));
-                await batch.commit();
-                loadData();
-            }
-        }
-
-        window.openSettings = async function() {
-            document.getElementById('settingsModal').style.display='block';
-            const snap = await getDoc(doc(db, "settings", "config"));
-            if(snap.exists()) {
-                document.getElementById('commissionInput').value = snap.data().commission;
-                document.getElementById('waSet').value = snap.data().adminPhone;
-                document.getElementById('passSet').value = snap.data().adminPassword;
-            }
-        }
-
-        window.saveConfig = async function() {
-            const c = document.getElementById('commissionInput').value;
-            const w = document.getElementById('waSet').value;
-            const p = document.getElementById('passSet').value;
-            await setDoc(doc(db, "settings", "config"), { commission: c, adminPhone: w, adminPassword: p }, { merge: true });
-            alert("تم الحفظ!"); location.reload();
+            } catch(e) { console.error(e); container.innerHTML = "خطأ في تحميل البيانات"; }
         }
     </script>
 </body>
