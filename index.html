@@ -3,69 +3,87 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>تسديدة محترف | حجز الملاعب</title>
+    <title>تسديدة محترف | حجز ملاعب العارضة</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root { --primary: #198754; --dark: #0f172a; --selected: #198754; --booked: #cbd5e1; }
-        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #f8fafc; margin: 0; padding: 15px; padding-bottom: 100px; text-align: right; }
+        :root { --primary: #10b981; --secondary: #3b82f6; --dark: #0f172a; --bg: #f8fafc; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); margin: 0; padding: 15px; padding-bottom: 100px; color: var(--dark); }
         .container { max-width: 600px; margin: 0 auto; }
         
-        header { text-align: center; margin-bottom: 30px; }
-        .brand-title { font-size: 32px; font-weight: 900; color: var(--dark); margin: 0; }
-        .brand-subtitle { color: var(--primary); font-weight: bold; display: block; margin-top: -5px; }
+        /* الهوية البصرية */
+        header { text-align: center; margin: 30px 0; }
+        .brand-h1 { font-size: 36px; font-weight: 900; margin: 0; background: linear-gradient(45deg, var(--dark), var(--primary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .brand-p { color: var(--primary); font-weight: bold; font-size: 18px; margin-top: -5px; }
 
-        .card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 20px; }
-        label { display: block; margin-bottom: 8px; font-weight: bold; color: #475569; }
-        select, input { width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 10px; margin-bottom: 15px; outline: none; font-family: inherit; }
+        .card { background: white; padding: 20px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); margin-bottom: 20px; border: 1px solid #e2e8f0; }
+        label { display: block; margin-bottom: 10px; font-weight: bold; color: #64748b; font-size: 14px; }
+        select, input { width: 100%; padding: 14px; border: 2px solid #f1f5f9; border-radius: 12px; margin-bottom: 15px; box-sizing: border-box; outline: none; transition: 0.3s; }
+        select:focus, input:focus { border-color: var(--primary); background: #fff; }
 
         /* شبكة الساعات */
-        .time-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 10px; }
-        .time-slot { padding: 12px; border: 1px solid #e2e8f0; border-radius: 8px; text-align: center; cursor: pointer; transition: 0.2s; font-size: 14px; background: #fff; }
-        .time-slot.selected { background: var(--selected); color: white; border-color: var(--selected); font-weight: bold; }
-        .time-slot.booked { background: var(--booked); color: #94a3b8; cursor: not-allowed; text-decoration: line-through; border-color: #e2e8f0; }
-        
-        .bottom-bar { position: fixed; bottom: 0; left: 0; right: 0; background: white; padding: 15px; box-shadow: 0 -4px 15px rgba(0,0,0,0.1); display: flex; flex-direction: column; align-items: center; z-index: 100; }
-        .btn-main { background: var(--dark); color: white; border: none; padding: 15px; width: 100%; max-width: 500px; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 16px; }
-        .price-tag { font-weight: bold; color: var(--primary); margin-bottom: 10px; font-size: 18px; }
+        .time-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+        .time-slot { padding: 12px; border: 2px solid #f1f5f9; border-radius: 12px; text-align: center; cursor: pointer; transition: 0.2s; font-size: 13px; font-weight: 600; }
+        .time-slot.selected { background: var(--primary); color: white; border-color: var(--primary); transform: scale(1.05); }
+        .time-slot.booked { background: #f1f5f9; color: #cbd5e1; cursor: not-allowed; text-decoration: line-through; }
+
+        /* نافذة التأكيد (Modal) */
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); display: none; align-items: center; justify-content: center; z-index: 2000; padding: 20px; }
+        .modal-content { background: white; padding: 30px; border-radius: 25px; width: 100%; max-width: 400px; text-align: center; }
+
+        .bottom-bar { position: fixed; bottom: 0; left: 0; right: 0; background: white; padding: 20px; box-shadow: 0 -10px 30px rgba(0,0,0,0.08); display: flex; align-items: center; justify-content: space-between; z-index: 100; border-top-left-radius: 25px; border-top-right-radius: 25px; }
+        .btn-pay { background: var(--dark); color: white; border: none; padding: 15px 35px; border-radius: 15px; font-weight: bold; cursor: pointer; font-size: 16px; display: flex; align-items: center; gap: 10px; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <header>
-        <h1 class="brand-title">تسديدة محترف</h1>
-        <span class="brand-subtitle">محافظة العارضة</span>
+        <h1 class="brand-h1">تسديدة محترف</h1>
+        <p class="brand-p">محافظة العارضة</p>
     </header>
 
     <div class="card">
-        <label><i class="fas fa-stadium"></i> اختر الملعب:</label>
-        <select id="stadiumSelect" onchange="loadAvailability()">
-            <option value="">-- اختر من قائمة ملاعب العارضة --</option>
-            <option value="ملعب بلدية العارضة" data-price="150">ملعب بلدية العارضة (150 ريال)</option>
-            <option value="ملعب الرواد" data-price="140">ملعب الرواد (140 ريال)</option>
-            <option value="ملعب المشاف" data-price="130">ملعب المشاف (130 ريال)</option>
-            <option value="ملعب الجوة" data-price="140">ملعب الجوة (140 ريال)</option>
-            <option value="ملعب قايم العارضة" data-price="120">ملعب قايم العارضة (120 ريال)</option>
+        <label><i class="fas fa-map-marker-alt"></i> اختر الملعب:</label>
+        <select id="stadiumSelect" onchange="loadStadiumData()">
+            <option value="">-- تحميل الملاعب... --</option>
         </select>
 
-        <label><i class="fas fa-calendar-alt"></i> تاريخ الحجز:</label>
+        <div id="stadiumInfo" style="display:none; margin-bottom:15px; font-size:13px; color:#64748b;">
+            <i class="fas fa-users"></i> السعة: <span id="stSize"></span> | <i class="fas fa-tag"></i> السعر: <span id="stPrice"></span> ريال
+        </div>
+
+        <label><i class="fas fa-calendar-day"></i> تاريخ الحجز:</label>
         <input type="date" id="bookDate" onchange="loadAvailability()">
 
-        <label><i class="fas fa-clock"></i> الساعات المتاحة (يمكنك اختيار أكثر من ساعة):</label>
-        <div id="timeGrid" class="time-grid">
-            <p style="grid-column: span 3; text-align:center; color:#94a3b8;">يرجى اختيار الملعب والتاريخ أولاً</p>
-        </div>
+        <label><i class="fas fa-clock"></i> الساعات المتاحة:</label>
+        <div id="timeGrid" class="time-grid"></div>
     </div>
 
     <div class="card">
-        <label><i class="fas fa-user"></i> اسم الكابتن:</label>
-        <input type="text" id="capName" placeholder="الاسم الثلاثي">
+        <input type="text" id="capName" placeholder="اسم الكابتن">
+        <div style="display:flex; align-items:center; gap:10px; background:#f0f9ff; padding:10px; border-radius:10px;">
+            <input type="checkbox" id="needsPlayers" style="width:20px; margin:0;">
+            <span style="font-size:14px; color:#0369a1; font-weight:bold;">نبحث عن محترفين لتكملة الفريق</span>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="confirmModal">
+    <div class="modal-content">
+        <i class="fas fa-check-circle" style="font-size:50px; color:var(--primary); margin-bottom:15px;"></i>
+        <h3>تأكيد الطلب</h3>
+        <div id="summaryText" style="text-align:right; font-size:14px; line-height:1.8; margin-bottom:20px;"></div>
+        <button class="btn-pay" style="width:100%; justify-content:center;" onclick="sendToWhatsApp()">إرسال الطلب الآن <i class="fab fa-whatsapp"></i></button>
+        <button onclick="closeModal()" style="background:none; border:none; margin-top:15px; color:#64748b; cursor:pointer;">إلغاء</button>
     </div>
 </div>
 
 <div class="bottom-bar">
-    <div class="price-tag" id="totalDisplay">الإجمالي: 0 ريال</div>
-    <button class="btn-main" onclick="confirmBooking()">تأكيد الحجز والتحويل للواتساب <i class="fab fa-whatsapp"></i></button>
+    <div>
+        <div style="font-size:12px; color:#64748b;">الإجمالي المتوقع:</div>
+        <div id="totalDisplay" style="font-size:22px; font-weight:900; color:var(--primary);">0 ريال</div>
+    </div>
+    <button class="btn-pay" onclick="openConfirm()">حجز <i class="fas fa-arrow-left"></i></button>
 </div>
 
 <script type="module">
@@ -85,93 +103,94 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
-
     let selectedHours = [];
-    let adminPhone = "966500000000"; // سيتم تحديثه من قاعدة البيانات
+    let currentStadium = null;
+    let adminPhone = "";
 
-    // جلب رقم الإدارة
-    getDoc(doc(db, "settings", "config")).then(s => { if(s.exists()) adminPhone = s.data().adminPhone; });
+    // تحميل الملاعب من قاعدة البيانات
+    async function init() {
+        const select = document.getElementById('stadiumSelect');
+        const config = await getDoc(doc(db, "settings", "config"));
+        if(config.exists()) adminPhone = config.data().adminPhone;
 
-    // تحميل الساعات وتحديد المحجوز منها
+        const snap = await getDocs(collection(db, "stadiums"));
+        select.innerHTML = '<option value="">-- اختر الملعب --</option>';
+        snap.forEach(d => {
+            select.innerHTML += `<option value="${d.id}">${d.data().name}</option>`;
+        });
+    }
+    init();
+
+    window.loadStadiumData = async function() {
+        const id = document.getElementById('stadiumSelect').value;
+        if(!id) return;
+        const snap = await getDoc(doc(db, "stadiums", id));
+        currentStadium = snap.data();
+        document.getElementById('stadiumInfo').style.display = 'block';
+        document.getElementById('stSize').innerText = currentStadium.size || '7 ضد 7';
+        document.getElementById('stPrice').innerText = currentStadium.price;
+        loadAvailability();
+    }
+
     window.loadAvailability = async function() {
-        const stadium = document.getElementById('stadiumSelect').value;
         const date = document.getElementById('bookDate').value;
         const grid = document.getElementById('timeGrid');
+        if(!date || !currentStadium) return;
         
-        if(!stadium || !date) return;
+        grid.innerHTML = '<p>جاري التحقق...</p>';
+        selectedHours = []; updatePrice();
 
-        grid.innerHTML = '<p style="grid-column: span 3; text-align:center;">جاري التحقق من التوفر...</p>';
-        selectedHours = [];
-        updateUI();
-
-        // جلب الحجوزات الحالية لهذا الملعب والتاريخ
-        const q = query(collection(db, "bookings"), where("stadiumName", "==", stadium), where("date", "==", date));
+        const q = query(collection(db, "bookings"), where("stadiumName", "==", currentStadium.name), where("date", "==", date));
         const snap = await getDocs(q);
-        let bookedHours = [];
-        snap.forEach(d => { if(d.data().bookedSlots) bookedHours.push(...d.data().bookedSlots); });
+        let booked = []; snap.forEach(d => booked.push(...(d.data().bookedSlots || [])));
 
         grid.innerHTML = '';
-        // توليد ساعات العمل (من 4 عصراً إلى 2 فجراً كمثال)
-        for(let h = 16; h <= 26; h++) {
-            const displayTime = formatTime(h);
-            const slot = document.createElement('div');
-            slot.className = 'time-slot';
-            
-            if(bookedHours.includes(h)) {
-                slot.classList.add('booked');
-                slot.innerHTML = `${displayTime}<br><small>محجوز</small>`;
-            } else {
-                slot.innerText = displayTime;
-                slot.onclick = () => toggleHour(h, slot);
-            }
-            grid.appendChild(slot);
+        for(let h=16; h<=26; h++) {
+            const div = document.createElement('div');
+            div.className = 'time-slot' + (booked.includes(h) ? ' booked' : '');
+            div.innerText = (h%12 || 12) + ':00 ' + (h>=12 && h<24 ? 'م' : 'ص');
+            if(!booked.includes(h)) div.onclick = () => {
+                div.classList.toggle('selected');
+                if(selectedHours.includes(h)) selectedHours = selectedHours.filter(x => x!==h);
+                else selectedHours.push(h);
+                updatePrice();
+            };
+            grid.appendChild(div);
         }
     }
 
-    function toggleHour(h, el) {
-        if(selectedHours.includes(h)) {
-            selectedHours = selectedHours.filter(item => item !== h);
-            el.classList.remove('selected');
-        } else {
-            selectedHours.push(h);
-            el.classList.add('selected');
-        }
-        updateUI();
+    function updatePrice() {
+        const total = selectedHours.length * (currentStadium?.price || 0);
+        document.getElementById('totalDisplay').innerText = total + " ريال";
     }
 
-    function updateUI() {
-        const select = document.getElementById('stadiumSelect');
-        const price = select.options[select.selectedIndex]?.dataset.price || 0;
-        document.getElementById('totalDisplay').innerText = `الإجمالي: ${selectedHours.length * price} ريال`;
-    }
-
-    function formatTime(h) {
-        let hour = h % 24;
-        let suffix = hour >= 12 ? "مساءً" : "صباحاً";
-        let displayH = hour % 12 || 12;
-        return `${displayH}:00 ${suffix}`;
-    }
-
-    window.confirmBooking = async function() {
+    window.openConfirm = function() {
         const name = document.getElementById('capName').value;
-        const stadium = document.getElementById('stadiumSelect').value;
+        if(!name || selectedHours.length === 0) return alert("أكمل البيانات");
+        document.getElementById('summaryText').innerHTML = `
+            <b>الملعب:</b> ${currentStadium.name}<br>
+            <b>التاريخ:</b> ${document.getElementById('bookDate').value}<br>
+            <b>الساعات:</b> ${selectedHours.length}<br>
+            <b>الإجمالي:</b> ${selectedHours.length * currentStadium.price} ريال
+        `;
+        document.getElementById('confirmModal').style.display = 'flex';
+    }
+
+    window.closeModal = () => document.getElementById('confirmModal').style.display = 'none';
+
+    window.sendToWhatsApp = async function() {
+        const name = document.getElementById('capName').value;
         const date = document.getElementById('bookDate').value;
+        const total = selectedHours.length * currentStadium.price;
         
-        if(!name || !stadium || !date || selectedHours.length === 0) return alert("أكمل البيانات واختر ساعة واحدة على الأقل");
+        await addDoc(collection(db, "bookings"), {
+            clientName: name, stadiumName: currentStadium.name, date,
+            bookedSlots: selectedHours, price: total, createdAt: new Date().toISOString()
+        });
 
-        const price = document.getElementById('stadiumSelect').options[document.getElementById('stadiumSelect').selectedIndex].dataset.price;
-        const total = selectedHours.length * price;
-
-        try {
-            await addDoc(collection(db, "bookings"), {
-                clientName: name, stadiumName: stadium, date: date,
-                bookedSlots: selectedHours, price: total, createdAt: new Date().toISOString()
-            });
-
-            const msg = `*حجز جديد - تسديدة محترف*\n👤 الكابتن: ${name}\n🏟️ الملعب: ${stadium}\n📅 التاريخ: ${date}\n⏰ الساعات: ${selectedHours.map(formatTime).join('، ')}\n💰 الإجمالي: ${total} ريال`;
-            window.open(`https://wa.me/${adminPhone}?text=${encodeURIComponent(msg)}`, '_blank');
-            location.reload();
-        } catch(e) { alert("خطأ في الحجز، حاول ثانية"); }
+        const msg = `*طلب حجز - تسديدة محترف*\n👤 الكابتن: ${name}\n🏟️ الملعب: ${currentStadium.name}\n📅 التاريخ: ${date}\n💰 الإجمالي: ${total} ريال`;
+        window.open(`https://wa.me/${adminPhone}?text=${encodeURIComponent(msg)}`, '_blank');
+        location.reload();
     }
 </script>
 </body>
