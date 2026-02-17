@@ -1,152 +1,160 @@
+
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>لوحة القيادة | Pro Admin</title>
+    <title>لوحة التحكم | Pro Admin</title>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root { --sidebar-bg: #0f172a; --main-bg: #f3f4f6; --accent: #10b981; --white: #ffffff; }
-        body { font-family: 'Tajawal', sans-serif; margin: 0; display: flex; height: 100vh; background: var(--main-bg); overflow: hidden; }
+        :root { --sidebar-bg: #0f172a; --bg: #f3f4f6; --accent: #006847; }
+        body { font-family: 'Tajawal', sans-serif; background: var(--bg); margin: 0; display: flex; height: 100vh; overflow: hidden; }
 
-        /* Sidebar & Layout (نفس التنسيق السابق الاحترافي) */
-        aside { width: 250px; background: var(--sidebar-bg); color: white; display: flex; flex-direction: column; padding: 20px; transition: 0.3s; flex-shrink: 0; box-shadow: 5px 0 15px rgba(0,0,0,0.1); }
-        .logo-area { padding: 20px 0; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 30px; text-align: center; }
-        .logo-area h1 { margin: 0; font-size: 24px; color: var(--accent); }
-        .nav-item { padding: 15px; margin-bottom: 8px; border-radius: 12px; cursor: pointer; color: #94a3b8; font-weight: 600; display: flex; align-items: center; gap: 12px; transition: 0.2s; }
+        /* Sidebar (20%) */
+        aside { width: 260px; background: var(--sidebar-bg); color: white; display: flex; flex-direction: column; padding: 20px; transition: 0.3s; flex-shrink: 0; }
+        .logo { padding: 20px 0; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px; }
+        .logo h2 { margin: 0; color: var(--accent); }
+        .nav-item { padding: 15px; border-radius: 12px; margin-bottom: 8px; cursor: pointer; color: #94a3b8; font-weight: 600; display: flex; align-items: center; gap: 10px; transition: 0.2s; }
         .nav-item:hover, .nav-item.active { background: var(--accent); color: white; transform: translateX(-5px); }
 
+        /* Content (80%) */
         main { flex-grow: 1; padding: 30px; overflow-y: auto; }
-        .view-section { display: none; animation: fadeIn 0.4s; }
-        .view-section.active { display: block; }
+        .view { display: none; animation: fadeIn 0.4s; }
+        .view.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* Cards & Tables */
+        /* Components */
         .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 30px; }
-        .stat-box { background: var(--white); padding: 25px; border-radius: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.03); border-right: 5px solid var(--accent); }
-        .stat-box h3 { margin: 0; font-size: 28px; color: var(--sidebar-bg); }
+        .stat-card { background: white; padding: 25px; border-radius: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.03); border-right: 5px solid var(--accent); }
+        .stat-card h3 { margin: 0; font-size: 28px; color: var(--sidebar-bg); }
 
-        table { width: 100%; border-collapse: collapse; background: white; border-radius: 15px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.03); }
-        th { background: #f8fafc; padding: 15px; text-align: right; color: #64748b; font-size: 13px; font-weight: bold; border-bottom: 2px solid #e2e8f0; }
-        td { padding: 15px; border-bottom: 1px solid #f1f5f9; font-size: 14px; vertical-align: middle; }
+        /* Tables */
+        table { width: 100%; background: white; border-radius: 16px; border-collapse: collapse; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.03); }
+        th { background: #f9fafb; padding: 15px; text-align: right; color: #6b7280; font-size: 13px; font-weight: bold; border-bottom: 2px solid #e5e7eb; }
+        td { padding: 15px; border-bottom: 1px solid #f3f4f6; font-size: 14px; }
         
-        .badge { padding: 5px 10px; border-radius: 20px; font-size: 11px; font-weight: bold; }
-        .badge-pending { background: #fff7ed; color: #c2410c; }
-        .badge-confirmed { background: #f0fdf4; color: #15803d; }
+        .badge { padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: bold; }
+        .pending { background: #fff7ed; color: #c2410c; }
+        .confirmed { background: #f0fdf4; color: #15803d; }
 
         /* Stadium Icons */
-        .stadiums-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; }
-        .stadium-circle { background: white; border-radius: 20px; padding: 20px; text-align: center; cursor: pointer; transition: 0.3s; box-shadow: 0 5px 15px rgba(0,0,0,0.05); border: 2px solid transparent; }
-        .stadium-circle:hover { transform: translateY(-5px); border-color: var(--accent); }
-        .stadium-circle i { font-size: 40px; color: var(--accent); margin-bottom: 10px; }
+        .stadium-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; }
+        .stadium-icon { background: white; padding: 20px; border-radius: 20px; text-align: center; cursor: pointer; transition: 0.3s; border: 2px solid transparent; }
+        .stadium-icon:hover { border-color: var(--accent); transform: translateY(-5px); }
+        .stadium-icon i { font-size: 40px; color: var(--accent); margin-bottom: 10px; }
 
-        /* Settings Specific Styles (التعديلات الجديدة) */
-        .settings-card { background: white; padding: 30px; border-radius: 20px; box-shadow: 0 5px 20px rgba(0,0,0,0.03); margin-bottom: 20px; }
-        .add-stadium-box { background: #f0fdf4; padding: 20px; border-radius: 15px; border: 1px dashed var(--accent); display: flex; gap: 10px; align-items: flex-end; margin-bottom: 30px; }
-        .input-group { flex: 1; }
-        .input-group label { display: block; font-size: 12px; font-weight: bold; margin-bottom: 5px; color: #064e3b; }
-        
-        .stadium-row { display: flex; align-items: center; justify-content: space-between; background: #f8fafc; padding: 15px; border-radius: 12px; margin-bottom: 10px; border: 1px solid #e2e8f0; }
-        .stadium-row input { background: white; border: 1px solid #cbd5e1; padding: 8px; border-radius: 8px; width: 100px; text-align: center; }
-        
-        input { width: 100%; padding: 12px; border: 1px solid #e2e8f0; border-radius: 10px; font-family: 'Tajawal'; outline: none; box-sizing: border-box; }
-        .btn { padding: 12px 20px; border-radius: 10px; border: none; font-weight: bold; cursor: pointer; transition: 0.2s; }
-        .btn-save { background: var(--accent); color: white; }
-        .btn-del { background: #fee2e2; color: #dc2626; padding: 8px 15px; }
-        
+        /* Settings Forms */
+        .settings-box { background: white; padding: 25px; border-radius: 20px; margin-bottom: 20px; }
+        input { width: 100%; padding: 12px; border: 1px solid #e5e7eb; border-radius: 10px; margin-bottom: 10px; outline: none; }
+        .btn { padding: 10px 20px; background: var(--accent); color: white; border: none; border-radius: 10px; cursor: pointer; font-weight: bold; }
+        .btn-del { background: #fee2e2; color: #dc2626; padding: 5px 10px; }
+
+        /* Login */
         #loginScreen { position: fixed; inset: 0; background: var(--sidebar-bg); z-index: 9999; display: flex; align-items: center; justify-content: center; }
-        .login-box { background: white; padding: 40px; border-radius: 20px; width: 350px; text-align: center; }
+        .login-card { background: white; padding: 40px; border-radius: 20px; width: 350px; text-align: center; }
     </style>
 </head>
 <body>
 
 <div id="loginScreen">
-    <div class="login-box">
-        <h2 style="color:var(--sidebar-bg); margin-top:0;">بوابة الإدارة</h2>
-        <input type="password" id="adminPass" style="width:100%; padding:10px; margin-bottom:20px; border:1px solid #ddd; border-radius:8px;" placeholder="كلمة المرور">
-        <button onclick="login()" class="btn btn-save" style="width:100%">دخول</button>
+    <div class="login-card">
+        <h2 style="color:var(--sidebar-bg);">بوابة الإدارة</h2>
+        <input type="password" id="adminPass" placeholder="كلمة المرور">
+        <button class="btn" style="width:100%" onclick="login()">دخول</button>
     </div>
 </div>
 
 <aside>
-    <div class="logo-area">
-        <h1>تسديدة <span>محترف</span></h1>
-        <small>لوحة التحكم V4.0</small>
+    <div class="logo">
+        <h2>تسديدة <span>محترف</span></h2>
+        <small style="color:#64748b;">V5.0</small>
     </div>
-    <div class="nav-item active" onclick="switchTab('dash', this)"><i class="fas fa-home"></i> الرئيسية</div>
-    <div class="nav-item" onclick="switchTab('bookings', this)"><i class="fas fa-futbol"></i> الحجوزات</div>
-    <div class="nav-item" onclick="switchTab('finance', this)"><i class="fas fa-coins"></i> التقارير المالية</div>
-    <div class="nav-item" onclick="switchTab('settings', this)"><i class="fas fa-cogs"></i> إعدادات النظام</div>
-    <div class="nav-item" onclick="location.reload()" style="margin-top:auto; color:#f87171;"><i class="fas fa-sign-out-alt"></i> خروج</div>
+    <div class="nav-item active" onclick="nav('dash', this)"><i class="fas fa-home"></i> الرئيسية</div>
+    <div class="nav-item" onclick="nav('bookings', this)"><i class="fas fa-futbol"></i> الحجوزات والملاعب</div>
+    <div class="nav-item" onclick="nav('finance', this)"><i class="fas fa-chart-pie"></i> المالية</div>
+    <div class="nav-item" onclick="nav('settings', this)"><i class="fas fa-cogs"></i> الإعدادات</div>
+    <div class="nav-item" style="margin-top:auto; color:#f87171;" onclick="location.reload()"><i class="fas fa-sign-out-alt"></i> خروج</div>
 </aside>
 
 <main>
-    <div id="dash" class="view-section active">
+    <div id="dash" class="view active">
         <h2 style="margin-bottom:20px;">نظرة عامة</h2>
         <div class="stat-grid">
-            <div class="stat-box"><h3 id="dIncome">0 ريال</h3><p>الدخل الكلي</p></div>
-            <div class="stat-box"><h3 id="dPending">0</h3><p>طلبات الانتظار</p></div>
-            <div class="stat-box"><h3 id="dTotal">0</h3><p>عدد الحجوزات</p></div>
+            <div class="stat-card">
+                <h3 id="dIncome">0 ريال</h3>
+                <p>إجمالي الدخل</p>
+            </div>
+            <div class="stat-card" style="border-right-color:#f59e0b;">
+                <h3 id="dPending">0</h3>
+                <p>طلبات الانتظار</p>
+            </div>
+            <div class="stat-card" style="border-right-color:#3b82f6;">
+                <h3 id="dCount">0</h3>
+                <p>إجمالي الحجوزات</p>
+            </div>
         </div>
-        <h3>آخر النشاطات</h3>
+
+        <h3>آخر النشاطات (يتطلب إجراء)</h3>
         <table id="dashTable">
-            <thead><tr><th>الكابتن</th><th>الملعب</th><th>السعر</th><th>الإجراء</th></tr></thead>
+            <thead>
+                <tr><th>الكابتن</th><th>الملعب</th><th>التاريخ</th><th>الحالة</th><th>الإجراء</th></tr>
+            </thead>
             <tbody></tbody>
         </table>
     </div>
 
-    <div id="bookings" class="view-section">
+    <div id="bookings" class="view">
         <h2>إدارة الملاعب والحجوزات</h2>
-        <div id="stadiumsListIcons" class="stadiums-container"></div>
-        <div id="stadiumDetailsTable" style="display:none; margin-top:30px;">
-            <button onclick="closeDetail()" class="btn" style="background:#ddd; margin-bottom:10px;">عودة</button>
-            <h3 id="detailTitle"></h3>
-            <table><thead><tr><th>الكابتن</th><th>التاريخ</th><th>الحالة</th></tr></thead><tbody id="detailBody"></tbody></table>
-        </div>
-    </div>
-
-    <div id="finance" class="view-section">
-        <h2>التقارير المالية</h2>
-        <div id="financeGrid" class="stadiums-container"></div>
-    </div>
-
-    <div id="settings" class="view-section">
-        <h2>إعدادات النظام والملاعب</h2>
+        <div id="stadiumsIconsList" class="stadium-grid"></div>
         
-        <div class="settings-card">
-            <h3><i class="fas fa-tools"></i> بيانات التواصل والعمولة</h3>
-            <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:15px;">
-                <div><label>رقم الواتساب</label><input type="text" id="setPhone"></div>
-                <div><label>رقم الجوال</label><input type="text" id="setMobile"></div>
-                <div><label>العمولة (%)</label><input type="number" id="setComm"></div>
+        <div id="stadiumDetail" style="display:none; margin-top:30px;">
+            <div style="display:flex; justify-content:space-between;">
+                <h3 id="detailTitle" style="color:var(--accent);">تفاصيل الملعب</h3>
+                <button class="btn" style="background:#e5e7eb; color:#333;" onclick="closeDetail()">عودة</button>
             </div>
-            <button class="btn btn-save" onclick="saveGeneralSettings()" style="margin-top:15px; width:100%;">حفظ البيانات العامة</button>
+            <table>
+                <thead><tr><th>الكابتن</th><th>التاريخ</th><th>السعر</th><th>الحالة</th></tr></thead>
+                <tbody id="detailBody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="finance" class="view">
+        <h2>التقارير المالية (حسب الملعب)</h2>
+        <div id="financeGrid" class="stadium-grid"></div>
+    </div>
+
+    <div id="settings" class="view">
+        <h2>إعدادات النظام</h2>
+        
+        <div class="settings-box">
+            <h3><i class="fas fa-tools"></i> إضافة ملعب جديد</h3>
+            <div style="display:flex; gap:10px;">
+                <input type="text" id="newSName" placeholder="اسم الملعب">
+                <input type="number" id="newSPrice" placeholder="السعر (ريال)">
+                <button class="btn" onclick="addStadium()">إضافة</button>
+            </div>
         </div>
 
-        <div class="add-stadium-box">
-            <div class="input-group">
-                <label>اسم الملعب الجديد</label>
-                <input type="text" id="newStadName" placeholder="مثال: ملعب النخبة">
-            </div>
-            <div class="input-group">
-                <label>سعر الساعة (ريال)</label>
-                <input type="number" id="newStadPrice" placeholder="150">
-            </div>
-            <button class="btn btn-save" onclick="addNewStadium()" style="height:46px; margin-bottom:2px;">+ إضافة الملعب</button>
+        <div class="settings-box">
+            <h3><i class="fas fa-list"></i> تعديل الملاعب الحالية</h3>
+            <div id="editStadiumsList"></div>
         </div>
 
-        <div class="settings-card">
-            <h3><i class="fas fa-list"></i> قائمة الملاعب الحالية (تعديل الأسعار)</h3>
-            <p style="font-size:12px; color:#64748b; margin-bottom:15px;">يمكنك تغيير السعر هنا في أي وقت (أيام عادية أو مواسم)، وسيظهر فوراً للعملاء.</p>
-            <div id="stadiumsEditList">
-                </div>
+        <div class="settings-box">
+            <h3><i class="fas fa-user-cog"></i> بيانات الاتصال والعمولة</h3>
+            <label>رقم الواتساب:</label>
+            <input type="text" id="setPhone">
+            <label>نسبة العمولة (%):</label>
+            <input type="number" id="setComm">
+            <button class="btn" style="width:100%; margin-top:10px; background:#1f2937;" onclick="saveGenSettings()">حفظ</button>
         </div>
     </div>
 </main>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, collection, getDocs, doc, getDoc, updateDoc, deleteDoc, setDoc, addDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getFirestore, collection, getDocs, doc, getDoc, updateDoc, deleteDoc, addDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyAfn2LhKnsVGQmoAK_HexN_6bm2-NICNSY",
@@ -159,7 +167,8 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
-    let allBookings = [], allStadiums = [];
+    let allData = [];
+    let allStadiums = [];
 
     window.login = async () => {
         const p = document.getElementById('adminPass').value;
@@ -167,154 +176,160 @@
         const real = snap.exists() ? snap.data().adminPassword : "123";
         if(p === real) {
             document.getElementById('loginScreen').style.display='none';
-            loadAllData();
+            loadData();
         } else { alert("خطأ!"); }
     }
 
-    window.switchTab = (id, el) => {
-        document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
+    window.nav = (id, el) => {
+        document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
         document.getElementById(id).classList.add('active');
         document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
         el.classList.add('active');
     }
 
-    async function loadAllData() {
-        // تحميل البيانات العامة
+    async function loadData() {
+        // Load Settings
         const conf = await getDoc(doc(db, "settings", "config"));
         if(conf.exists()) {
             document.getElementById('setPhone').value = conf.data().adminPhone || '';
-            document.getElementById('setMobile').value = conf.data().adminMobile || '';
             document.getElementById('setComm').value = conf.data().commission || 10;
         }
 
-        const bSnap = await getDocs(collection(db, "bookings"));
+        // Load Stadiums & Bookings
         const sSnap = await getDocs(collection(db, "stadiums"));
+        const bSnap = await getDocs(collection(db, "bookings"));
         
-        allBookings = []; allStadiums = [];
-        bSnap.forEach(d => allBookings.push({id: d.id, ...d.data()}));
+        allStadiums = []; allData = [];
         sSnap.forEach(d => allStadiums.push({id: d.id, ...d.data()}));
+        bSnap.forEach(d => allData.push({id: d.id, ...d.data()}));
 
-        renderDashboard();
-        renderStadiumsSettings();
-        renderStadiumsIcons();
+        renderDash();
+        renderStadiums();
+        renderFinance();
+        renderSettingsList();
     }
 
-    // --- قسم الإعدادات الجديد ---
-    function renderStadiumsSettings() {
-        const div = document.getElementById('stadiumsEditList');
+    function renderDash() {
+        const tbody = document.querySelector('#dashTable tbody');
+        tbody.innerHTML = '';
+        let inc=0, pend=0;
+
+        allData.sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+        allData.forEach(d => {
+            if(d.status !== 'rejected') inc += Number(d.price||0);
+            if(d.status === 'pending') pend++;
+
+            const badge = d.status==='pending' ? '<span class="badge pending">انتظار</span>' : 
+                          d.status==='rejected' ? '<span class="badge" style="background:#fee2e2;color:red;">مرفوض</span>' :
+                          '<span class="badge confirmed">مؤكد</span>';
+            
+            const actions = d.status === 'pending' ? `
+                <button class="btn" style="padding:5px 10px; background:#d1fae5; color:green;" onclick="setStatus('${d.id}', 'confirmed')">✔</button>
+                <button class="btn" style="padding:5px 10px; background:#fee2e2; color:red;" onclick="setStatus('${d.id}', 'rejected')">✘</button>
+            ` : '-';
+
+            tbody.innerHTML += `<tr><td>${d.clientName}</td><td>${d.stadiumName}</td><td>${d.date}</td><td>${badge}</td><td>${actions}</td></tr>`;
+        });
+
+        document.getElementById('dIncome').innerText = inc + " ريال";
+        document.getElementById('dPending').innerText = pend;
+        document.getElementById('dCount').innerText = allData.length;
+    }
+
+    window.setStatus = async (id, st) => {
+        await updateDoc(doc(db, "bookings", id), { status: st });
+        loadData();
+    }
+
+    function renderStadiums() {
+        const div = document.getElementById('stadiumsIconsList');
         div.innerHTML = '';
         allStadiums.forEach(s => {
             div.innerHTML += `
-                <div class="stadium-row">
-                    <b style="font-size:14px; color:#0f172a;">${s.name}</b>
-                    <div style="display:flex; gap:10px; align-items:center;">
-                        <span style="font-size:12px; color:#64748b;">السعر الحالي:</span>
-                        <input type="number" id="price_${s.id}" value="${s.price || 0}">
-                        <button class="btn btn-save" onclick="updateStadiumPrice('${s.id}')" style="padding:8px 12px; font-size:12px;">حفظ التعديل</button>
-                        <button class="btn btn-del" onclick="deleteStadium('${s.id}')"><i class="fas fa-trash"></i></button>
-                    </div>
+                <div class="stadium-icon" onclick="showDetail('${s.name}')">
+                    <i class="fas fa-futbol"></i>
+                    <h4>${s.name}</h4>
                 </div>
             `;
         });
     }
 
-    window.addNewStadium = async () => {
-        const name = document.getElementById('newStadName').value;
-        const price = document.getElementById('newStadPrice').value;
-        if(!name || !price) return alert("أكمل البيانات");
-        
-        await addDoc(collection(db, "stadiums"), { name: name, price: Number(price) });
-        alert("تمت إضافة الملعب ✅");
-        document.getElementById('newStadName').value = '';
-        document.getElementById('newStadPrice').value = '';
-        loadAllData();
-    }
-
-    window.updateStadiumPrice = async (id) => {
-        const price = document.getElementById('price_'+id).value;
-        await updateDoc(doc(db, "stadiums", id), { price: Number(price) });
-        alert("تم تحديث السعر بنجاح ✅");
-    }
-
-    window.deleteStadium = async (id) => {
-        if(confirm("هل أنت متأكد؟ سيتم حذف الملعب نهائياً!")) {
-            await deleteDoc(doc(db, "stadiums", id));
-            loadAllData();
-        }
-    }
-
-    window.saveGeneralSettings = async () => {
-        const p = document.getElementById('setPhone').value;
-        const m = document.getElementById('setMobile').value;
-        const c = document.getElementById('setComm').value;
-        await setDoc(doc(db, "settings", "config"), { adminPhone: p, adminMobile: m, commission: c }, { merge: true });
-        alert("تم حفظ الإعدادات العامة ✅");
-    }
-
-    // --- بقية الأقسام (الرئيسية، الحجوزات) ---
-    function renderDashboard() {
-        const tbody = document.querySelector('#dashTable tbody');
-        tbody.innerHTML = '';
-        let inc = 0, pend = 0;
-        
-        allBookings.sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt));
-        
-        allBookings.forEach(b => {
-            inc += Number(b.price || 0);
-            if(b.status === 'pending') pend++;
-            
-            // إضافة زر الإجراء فقط للطلبات المعلقة
-            const actionBtn = b.status === 'pending' ? 
-                `<button onclick="confirmBooking('${b.id}')" style="background:#d1fae5; color:green; border:none; padding:5px 10px; border-radius:5px; cursor:pointer;">تأكيد ✅</button>
-                 <button onclick="rejectBooking('${b.id}')" style="background:#fee2e2; color:red; border:none; padding:5px 10px; border-radius:5px; cursor:pointer;">رفض ❌</button>` : 
-                `<span style="color:#aaa;">مكتمل</span>`;
-
-            tbody.innerHTML += `<tr><td>${b.clientName}</td><td>${b.stadiumName}</td><td>${b.price}</td><td>${actionBtn}</td></tr>`;
-        });
-        document.getElementById('dIncome').innerText = inc + " ريال";
-        document.getElementById('dPending').innerText = pend;
-        document.getElementById('dTotal').innerText = allBookings.length;
-    }
-
-    window.confirmBooking = async (id) => { await updateDoc(doc(db, "bookings", id), { status: "confirmed" }); loadAllData(); }
-    window.rejectBooking = async (id) => { if(confirm("رفض الحجز؟")) { await deleteDoc(doc(db, "bookings", id)); loadAllData(); } }
-
-    function renderStadiumsIcons() {
-        const div = document.getElementById('stadiumsListIcons');
-        const finDiv = document.getElementById('financeGrid');
-        div.innerHTML = ''; finDiv.innerHTML = '';
-        
-        allStadiums.forEach(s => {
-            // أيقونات الحجوزات
-            div.innerHTML += `
-                <div class="stadium-circle" onclick="showStadiumDetails('${s.name}')">
-                    <i class="fas fa-futbol"></i>
-                    <h4>${s.name}</h4>
-                </div>`;
-            
-            // تقارير المالية
-            let sIncome = allBookings.filter(b => b.stadiumName === s.name).reduce((sum, b) => sum + Number(b.price || 0), 0);
-            finDiv.innerHTML += `
-                <div class="stat-box" style="text-align:center;">
-                    <h3>${sIncome} ريال</h3>
-                    <p>${s.name}</p>
-                </div>`;
-        });
-    }
-
-    window.showStadiumDetails = (name) => {
-        document.getElementById('stadiumsListIcons').style.display = 'none';
-        document.getElementById('stadiumDetailsTable').style.display = 'block';
+    window.showDetail = (name) => {
+        document.getElementById('stadiumsIconsList').style.display='none';
+        document.getElementById('stadiumDetail').style.display='block';
         document.getElementById('detailTitle').innerText = name;
+        
         const tbody = document.getElementById('detailBody');
         tbody.innerHTML = '';
-        allBookings.filter(b => b.stadiumName === name).forEach(b => {
-            tbody.innerHTML += `<tr><td>${b.clientName}</td><td>${b.date}</td><td>${b.status==='pending'?'انتظار':'مؤكد'}</td></tr>`;
+        allData.filter(d => d.stadiumName === name).forEach(d => {
+            tbody.innerHTML += `<tr><td>${d.clientName}</td><td>${d.date}</td><td>${d.price}</td><td>${d.status}</td></tr>`;
         });
     }
     window.closeDetail = () => {
-        document.getElementById('stadiumsListIcons').style.display = 'grid';
-        document.getElementById('stadiumDetailsTable').style.display = 'none';
+        document.getElementById('stadiumsIconsList').style.display='grid';
+        document.getElementById('stadiumDetail').style.display='none';
+    }
+
+    function renderFinance() {
+        const div = document.getElementById('financeGrid');
+        div.innerHTML = '';
+        let stats = {};
+        allData.forEach(d => {
+            if(d.status !== 'rejected') {
+                if(!stats[d.stadiumName]) stats[d.stadiumName] = 0;
+                stats[d.stadiumName] += Number(d.price||0);
+            }
+        });
+
+        for(let s in stats) {
+            div.innerHTML += `
+                <div class="stadium-icon" style="cursor:default; border-color:var(--accent);">
+                    <h3>${stats[s]} ريال</h3>
+                    <p>${s}</p>
+                </div>
+            `;
+        }
+    }
+
+    function renderSettingsList() {
+        const div = document.getElementById('editStadiumsList');
+        div.innerHTML = '';
+        allStadiums.forEach(s => {
+            div.innerHTML += `
+                <div style="display:flex; gap:10px; margin-bottom:10px; align-items:center;">
+                    <b style="width:120px;">${s.name}</b>
+                    <input type="number" id="price_${s.id}" value="${s.price}" style="margin:0;">
+                    <button class="btn" style="padding:8px;" onclick="updPrice('${s.id}')">حفظ</button>
+                    <button class="btn btn-del" onclick="delStadium('${s.id}')">حذف</button>
+                </div>
+            `;
+        });
+    }
+
+    window.addStadium = async () => {
+        const n = document.getElementById('newSName').value;
+        const p = document.getElementById('newSPrice').value;
+        if(!n || !p) return;
+        await addDoc(collection(db, "stadiums"), { name: n, price: Number(p) });
+        alert("تمت الإضافة"); loadData();
+    }
+
+    window.updPrice = async (id) => {
+        const p = document.getElementById('price_'+id).value;
+        await updateDoc(doc(db, "stadiums", id), { price: Number(p) });
+        alert("تم التحديث");
+    }
+
+    window.delStadium = async (id) => {
+        if(confirm("حذف؟")) { await deleteDoc(doc(db, "stadiums", id)); loadData(); }
+    }
+
+    window.saveGenSettings = async () => {
+        const ph = document.getElementById('setPhone').value;
+        const cm = document.getElementById('setComm').value;
+        await setDoc(doc(db, "settings", "config"), { adminPhone: ph, commission: cm }, { merge: true });
+        alert("تم الحفظ");
     }
 </script>
 </body>
