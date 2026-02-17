@@ -191,7 +191,38 @@
         const msg = `*طلب حجز - تسديدة محترف*\n👤 الكابتن: ${name}\n🏟️ الملعب: ${currentStadium.name}\n📅 التاريخ: ${date}\n💰 الإجمالي: ${total} ريال`;
         window.open(`https://wa.me/${adminPhone}?text=${encodeURIComponent(msg)}`, '_blank');
         location.reload();
+   }
+    // تحميل الملاعب مع خاصية "التشغيل التلقائي"
+    async function init() {
+        const select = document.getElementById('stadiumSelect');
+        const config = await getDoc(doc(db, "settings", "config"));
+        if(config.exists()) adminPhone = config.data().adminPhone;
+
+        const snap = await getDocs(collection(db, "stadiums"));
+        
+        // إذا كانت قاعدة البيانات فارغة، سنضيف ملاعب العارضة الأساسية فوراً
+        if (snap.empty) {
+            const defaultStadiums = [
+                { name: "ملعب بلدية العارضة", price: 150, size: "9 ضد 9" },
+                { name: "ملعب الرواد (العارضة)", price: 140, size: "7 ضد 7" },
+                { name: "ملعب المشاف", price: 130, size: "6 ضد 6" }
+            ];
+            
+            for (const st of defaultStadiums) {
+                await addDoc(collection(db, "stadiums"), st);
+            }
+            // إعادة التحميل بعد الإضافة التلقائية
+            location.reload(); 
+            return;
+        }
+
+        select.innerHTML = '<option value="">-- اختر الملعب --</option>';
+        snap.forEach(d => {
+            select.innerHTML += `<option value="${d.id}">${d.data().name}</option>`;
+        });
     }
+    init();
 </script>
 </body>
 </html>
+
