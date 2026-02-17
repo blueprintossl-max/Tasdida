@@ -3,30 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لوحة القيادة والتقارير</title>
+    <title>الإدارة والتقارير</title>
     <style>
         body { font-family: Tahoma, sans-serif; background: #f4f6f9; padding: 20px; }
         .container { max-width: 1200px; margin: 0 auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); display: none; }
         
-        /* بطاقات التقارير */
-        .stats-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 30px; }
-        .stat-card { background: linear-gradient(135deg, #1565c0, #42a5f5); color: white; padding: 20px; border-radius: 10px; text-align: center; }
-        .stat-card h3 { margin: 0; font-size: 30px; }
-        .stat-card p { margin: 5px 0 0 0; font-size: 14px; opacity: 0.9; }
+        /* الفلاتر */
+        .filters { display: flex; gap: 10px; margin-bottom: 20px; background: #f8f9fa; padding: 15px; border-radius: 8px; align-items: center; }
+        .filters select { padding: 8px; border-radius: 5px; border: 1px solid #ddd; width: 150px; }
+
+        /* البطاقات */
+        .stats-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 20px; }
+        .stat-card { background: #1565c0; color: white; padding: 20px; border-radius: 10px; text-align: center; }
         
         /* الجدول */
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        th { background: #f8f9fa; padding: 12px; color: #555; text-align: right; border-bottom: 2px solid #ddd; }
-        td { padding: 12px; border-bottom: 1px solid #eee; vertical-align: top; }
-        
-        .badge-pos { background: #ff9800; color: white; padding: 2px 6px; border-radius: 4px; font-size: 11px; margin-left: 2px; }
-        .status-paid { background: #d4edda; color: #155724; padding: 4px 8px; border-radius: 5px; font-weight: bold; font-size: 12px; }
-        .status-unpaid { background: #f8d7da; color: #721c24; padding: 4px 8px; border-radius: 5px; font-weight: bold; font-size: 12px; }
+        table { width: 100%; border-collapse: collapse; }
+        th { background: #eee; padding: 12px; border-bottom: 2px solid #ccc; text-align: right; }
+        td { padding: 10px; border-bottom: 1px solid #f0f0f0; }
 
         /* تسجيل الدخول */
         #loginScreen { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: #2c3e50; display: flex; align-items: center; justify-content: center; z-index: 999; }
-        .login-box { background: white; padding: 30px; width: 300px; border-radius: 10px; text-align: center; }
-        input { padding: 10px; width: 100%; margin-bottom: 10px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 5px; }
+        .login-box { background: white; padding: 30px; border-radius: 10px; text-align: center; width: 300px; }
+        input { padding: 10px; width: 100%; margin-bottom: 10px; box-sizing: border-box; }
         button { padding: 10px; width: 100%; cursor: pointer; border: none; border-radius: 5px; color: white; font-weight: bold; }
     </style>
 </head>
@@ -34,61 +32,98 @@
 
     <div id="loginScreen">
         <div class="login-box">
-            <h3>🔐 دخول الإدارة</h3>
-            <p style="color:#666; font-size:12px;">كلمة المرور الافتراضية: 123</p>
-            <input type="password" id="passInput" placeholder="أدخل كلمة المرور">
+            <h3>🔐 إدارة الملاعب</h3>
+            <input type="password" id="passInput" placeholder="كلمة المرور">
             <button style="background:#25d366;" onclick="login()">دخول</button>
             <p id="loginError" style="color:red; font-size:12px; margin-top:5px;"></p>
         </div>
     </div>
 
     <div class="container" id="dashboard">
-        <h2 style="margin-top:0;">📊 التقارير المالية والإحصائيات</h2>
-        <div class="stats-container">
-            <div class="stat-card">
-                <h3 id="totalMoney">0 ريال</h3>
-                <p>إجمالي المبيعات المتوقعة</p>
-            </div>
-            <div class="stat-card" style="background: linear-gradient(135deg, #2e7d32, #66bb6a);">
-                <h3 id="totalBookings">0</h3>
-                <p>عدد الحجوزات المسجلة</p>
-            </div>
-            <div class="stat-card" style="background: linear-gradient(135deg, #ef6c00, #ff9800);">
-                <h3 id="matchesNeeded">0</h3>
-                <p>مباريات تبحث عن لاعبين</p>
+        <div class="filters">
+            <label>📅 تصفية حسب الشهر:</label>
+            <select id="filterMonth" onchange="loadData()">
+                <option value="all">كل الأشهر</option>
+                <option value="01">يناير</option>
+                <option value="02">فبراير</option>
+                <option value="03">مارس</option>
+                <option value="04">أبريل</option>
+                <option value="05">مايو</option>
+                <option value="06">يونيو</option>
+                <option value="07">يوليو</option>
+                <option value="08">أغسطس</option>
+                <option value="09">سبتمبر</option>
+                <option value="10">أكتوبر</option>
+                <option value="11">نوفمبر</option>
+                <option value="12">ديسمبر</option>
+            </select>
+
+            <label>🏟️ الملعب:</label>
+            <select id="filterStadium" onchange="loadData()">
+                <option value="all">جميع الملاعب</option>
+                <option value="ملعب الجوهرة (الشمال)">الجوهرة</option>
+                <option value="ملعب الكامب نو (الشرق)">الكامب نو</option>
+                <option value="ملعب الأولمبي (الوسط)">الأولمبي</option>
+            </select>
+
+            <div style="flex:1; text-align:left;">
+                <button onclick="changeSettings()" style="background:#455a64; width:auto; padding:8px 20px;">⚙️ الإعدادات وأوقات الدوام</button>
             </div>
         </div>
 
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-            <h3>📋 تفاصيل الحجوزات</h3>
-            <div>
-                <button onclick="loadData()" style="background:#607d8b; width:auto; padding:8px 20px;">🔄 تحديث البيانات</button>
-                <button onclick="changeSettings()" style="background:#1565c0; width:auto; padding:8px 20px; margin-right:5px;">⚙️ الإعدادات</button>
+        <div class="stats-container">
+            <div class="stat-card">
+                <h3 id="totalRevenue">0 ريال</h3>
+                <p>إجمالي الدخل (حسب الفلتر)</p>
+            </div>
+            <div class="stat-card" style="background: #2e7d32;">
+                <h3 id="bookingsCount">0</h3>
+                <p>عدد الحجوزات</p>
+            </div>
+            <div class="stat-card" style="background: #ef6c00;">
+                <h3 id="playersRequests">0</h3>
+                <p>طلبات لاعبين</p>
             </div>
         </div>
+
+        <button onclick="loadData()" style="background:#1565c0; width:auto; padding:8px 20px; margin-bottom:10px;">🔄 تحديث الجدول</button>
 
         <table id="mainTable">
             <thead>
                 <tr>
                     <th>الكابتن</th>
-                    <th>التاريخ والوقت</th>
+                    <th>التاريخ / الأوقات</th>
                     <th>الملعب</th>
-                    <th>ملاحظات الفريق</th>
-                    <th>الحالة المالية</th>
-                    <th>حذف</th>
+                    <th>السعر</th>
+                    <th>حالة اللاعبين</th>
+                    <th>الدفع للمالك</th>
+                    <th>إجراء</th>
                 </tr>
             </thead>
             <tbody id="tableBody"></tbody>
         </table>
     </div>
 
-    <div id="settingsModal" style="display:none; position:fixed; top:20%; left:30%; right:30%; background:white; padding:20px; border:2px solid #333; box-shadow:0 0 20px rgba(0,0,0,0.5);">
-        <h3>الإعدادات</h3>
-        <label>رقم الواتساب:</label>
+    <div id="settingsModal" style="display:none; position:fixed; top:10%; left:30%; right:30%; background:white; padding:20px; border:2px solid #333; box-shadow:0 0 20px rgba(0,0,0,0.5); z-index:1000;">
+        <h3>⚙️ إعدادات النظام</h3>
+        
+        <label>📞 رقم الواتساب:</label>
         <input type="text" id="waSet">
-        <label>كلمة المرور:</label>
+        
+        <label>🔑 كلمة المرور:</label>
         <input type="text" id="passSet">
-        <button onclick="saveConfig()" style="background:green;">حفظ وإغلاق</button>
+
+        <hr>
+        <h4>⏰ ساعات عمل الملاعب</h4>
+        <p style="font-size:12px; color:gray;">استخدم نظام 24 ساعة (مثال: 16 = 4 عصراً، 26 = 2 فجراً)</p>
+        
+        <label>من الساعة:</label>
+        <input type="number" id="startHour" placeholder="مثال: 16">
+        
+        <label>إلى الساعة:</label>
+        <input type="number" id="endHour" placeholder="مثال: 26">
+
+        <button onclick="saveConfig()" style="background:green;">حفظ التغييرات</button>
         <button onclick="document.getElementById('settingsModal').style.display='none'" style="background:red; margin-top:5px;">إلغاء</button>
     </div>
 
@@ -96,125 +131,119 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, collection, getDocs, deleteDoc, doc, setDoc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        // 🔴🔴 الصق كود Firebase Config هنا 🔴🔴
-      const firebaseConfig = {
-  apiKey: "AIzaSyAfn2LhKnsVGQmoAK_HexN_6bm2-NICNSY",
-  authDomain: "tasdida.firebaseapp.com",
-  projectId: "tasdida",
-  storageBucket: "tasdida.firebasestorage.app",
-  messagingSenderId: "72604782215",
-  appId: "1:72604782215:web:38a014c331634398d9f222",
-  measurementId: "G-KV88C3MP0X"
-};
+        // 🔴 تم دمج الكود الخاص بك هنا بنجاح 🔴
+        const firebaseConfig = {
+          apiKey: "AIzaSyAfn2LhKnsVGQmoAK_HexN_6bm2-NICNSY",
+          authDomain: "tasdida.firebaseapp.com",
+          projectId: "tasdida",
+          storageBucket: "tasdida.firebasestorage.app",
+          messagingSenderId: "72604782215",
+          appId: "1:72604782215:web:38a014c331634398d9f222",
+          measurementId: "G-KV88C3MP0X"
+        };
+
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         let realPass = "123";
 
-        // الدخول
         window.login = async function() {
             const val = document.getElementById('passInput').value;
             const snap = await getDoc(doc(db, "settings", "config"));
             if(snap.exists()) {
                 if(snap.data().adminPassword) realPass = snap.data().adminPassword;
                 if(snap.data().adminPhone) document.getElementById('waSet').value = snap.data().adminPhone;
-                if(snap.data().adminPassword) document.getElementById('passSet').value = snap.data().adminPassword;
+                // تعبئة إعدادات الساعات
+                document.getElementById('startHour').value = snap.data().workStart || 16;
+                document.getElementById('endHour').value = snap.data().workEnd || 26;
             }
-            
             if(val === realPass) {
                 document.getElementById('loginScreen').style.display='none';
                 document.getElementById('dashboard').style.display='block';
                 loadData();
-            } else {
-                document.getElementById('loginError').innerText = "خطأ في كلمة المرور";
-            }
+            } else { document.getElementById('loginError').innerText = "خطأ!"; }
         }
 
-        // تحميل البيانات (تم تبسيط الكود لإظهار كل شيء)
         window.loadData = async function() {
             const tbody = document.getElementById('tableBody');
-            tbody.innerHTML = '<tr><td colspan="6" style="text-align:center">جاري جلب البيانات...</td></tr>';
+            const monthFilter = document.getElementById('filterMonth').value;
+            const stadiumFilter = document.getElementById('filterStadium').value;
+            
+            tbody.innerHTML = '<tr><td colspan="7" style="text-align:center">جاري التحميل...</td></tr>';
             
             try {
-                // جلب كل المستندات بدون شروط معقدة لضمان الظهور
                 const querySnapshot = await getDocs(collection(db, "bookings"));
-                
-                let totalRev = 0;
-                let neededCount = 0;
                 let rows = [];
+                let totalRev = 0;
+                let reqCount = 0;
 
                 querySnapshot.forEach((doc) => {
                     let d = doc.data();
-                    d.id = doc.id; // حفظ المعرف للحذف
-                    rows.push(d);
+                    d.id = doc.id;
                     
-                    // حساب التقارير
-                    if(d.price) totalRev += Number(d.price);
-                    if(d.needsPlayers) neededCount++;
+                    const bookingDate = d.date; 
+                    const bookingMonth = bookingDate.split('-')[1];
+
+                    let passMonth = (monthFilter === "all") || (bookingMonth === monthFilter);
+                    let passStadium = (stadiumFilter === "all") || (d.stadiumName === stadiumFilter);
+
+                    if(passMonth && passStadium) {
+                        rows.push(d);
+                        if(d.price) totalRev += Number(d.price);
+                        if(d.needsPlayers) reqCount++;
+                    }
                 });
 
-                // ترتيب البيانات يدوياً (الأحدث أولاً) لتجنب أخطاء الفهرسة
-                rows.sort((a, b) => new Date(b.createdAt || b.date) - new Date(a.createdAt || a.date));
+                rows.sort((a, b) => new Date(b.date) - new Date(a.date));
 
-                // تحديث كروت التقارير
-                document.getElementById('totalBookings').innerText = rows.length;
-                document.getElementById('totalMoney').innerText = totalRev + " ريال";
-                document.getElementById('matchesNeeded').innerText = neededCount;
+                document.getElementById('bookingsCount').innerText = rows.length;
+                document.getElementById('totalRevenue').innerText = totalRev + " ريال";
+                document.getElementById('playersRequests').innerText = reqCount;
 
-                // رسم الجدول
                 tbody.innerHTML = '';
-                if(rows.length === 0) { tbody.innerHTML = '<tr><td colspan="6" style="text-align:center">لا توجد حجوزات حتى الآن</td></tr>'; return; }
+                if(rows.length === 0) { tbody.innerHTML = '<tr><td colspan="7" style="text-align:center">لا توجد نتائج لهذا الفلتر</td></tr>'; return; }
 
                 rows.forEach(item => {
-                    // تنسيق المراكز المطلوبة
-                    let posHtml = '';
-                    if(item.needsPlayers && item.wantedPositions) {
-                        item.wantedPositions.forEach(p => posHtml += `<span class="badge-pos">${p}</span>`);
-                    } else if (item.needsPlayers) {
-                        posHtml = '<span style="color:orange; font-size:12px;">(يحتاج لاعبين)</span>';
-                    }
-
-                    // زر حالة الدفع
-                    let payBtn = `<button onclick="togglePay('${item.id}', ${item.paidToOwner})">
-                        ${item.paidToOwner ? '<span class="status-paid">مدفوع للمالك</span>' : '<span class="status-unpaid">معلق (لم يدفع)</span>'}
-                    </button>`;
+                    let times = item.timeDisplay || item.time;
+                    let payStatus = item.paidToOwner ? '<span style="color:green;font-weight:bold;">مدفوع</span>' : '<span style="color:red;">معلق</span>';
+                    let playersStatus = item.needsPlayers ? `<span style="background:orange;color:white;padding:2px 5px;border-radius:4px;">مطلوب: ${item.wantedPositions?.join(',') || 'عام'}</span>` : 'مكتمل';
 
                     tbody.innerHTML += `
                         <tr>
-                            <td><strong>${item.clientName}</strong></td>
-                            <td>${item.date}<br><span style="color:#1565c0">${item.time}</span></td>
-                            <td>${item.stadiumName}<br><small>${item.price} ريال</small></td>
-                            <td>${posHtml || '-'}</td>
-                            <td>${payBtn}</td>
-                            <td><button onclick="del('${item.id}')" style="background:#d32f2f; width:auto; padding:5px 10px;">🗑️</button></td>
+                            <td>${item.clientName}</td>
+                            <td>${item.date}<br><small>${times}</small></td>
+                            <td>${item.stadiumName}</td>
+                            <td>${item.price} ريال</td>
+                            <td>${playersStatus}</td>
+                            <td>
+                                <button onclick="togglePay('${item.id}', ${item.paidToOwner})">${payStatus}</button>
+                            </td>
+                            <td><button onclick="del('${item.id}')" style="background:#d32f2f;padding:5px;">🗑️</button></td>
                         </tr>
                     `;
                 });
 
-            } catch(e) {
-                console.error(e);
-                tbody.innerHTML = `<tr><td colspan="6" style="color:red; text-align:center">خطأ: ${e.message}</td></tr>`;
-            }
+            } catch(e) { console.error(e); }
         }
 
-        window.togglePay = async function(id, state) {
-            await updateDoc(doc(db, "bookings", id), { paidToOwner: !state });
-            loadData();
-        }
-
-        window.del = async function(id) {
-            if(confirm("حذف هذا الحجز نهائياً؟")) {
-                await deleteDoc(doc(db, "bookings", id));
-                loadData();
-            }
-        }
+        window.togglePay = async function(id, state) { await updateDoc(doc(db, "bookings", id), { paidToOwner: !state }); loadData(); }
+        window.del = async function(id) { if(confirm("حذف؟")) { await deleteDoc(doc(db, "bookings", id)); loadData(); } }
         
         window.changeSettings = function() { document.getElementById('settingsModal').style.display='block'; }
         
         window.saveConfig = async function() {
             const w = document.getElementById('waSet').value;
             const p = document.getElementById('passSet').value;
-            await setDoc(doc(db, "settings", "config"), { adminPhone: w, adminPassword: p }, { merge: true });
-            alert("تم حفظ الإعدادات");
+            const start = document.getElementById('startHour').value;
+            const end = document.getElementById('endHour').value;
+            
+            await setDoc(doc(db, "settings", "config"), { 
+                adminPhone: w, 
+                adminPassword: p,
+                workStart: start,
+                workEnd: end
+            }, { merge: true });
+            
+            alert("✅ تم حفظ الإعدادات وأوقات العمل!");
             document.getElementById('settingsModal').style.display='none';
             if(p) realPass = p;
         }
