@@ -108,9 +108,15 @@
     import { getFirestore, collection, addDoc, query, where, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     // 🔴🔴 الصق كود Firebase Config هنا 🔴🔴
-    const firebaseConfig = {
-        // ... الصق الكود ...
-    };
+  const firebaseConfig = {
+  apiKey: "AIzaSyAfn2LhKnsVGQmoAK_HexN_6bm2-NICNSY",
+  authDomain: "tasdida.firebaseapp.com",
+  projectId: "tasdida",
+  storageBucket: "tasdida.firebasestorage.app",
+  messagingSenderId: "72604782215",
+  appId: "1:72604782215:web:38a014c331634398d9f222",
+  measurementId: "G-KV88C3MP0X"
+};
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
@@ -277,3 +283,4 @@
 </script>
 </body>
 </html>
+
