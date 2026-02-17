@@ -4,132 +4,147 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>تسديدة محترف | Pro Striker</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root { --main: #10b981; --dark: #0f172a; --bg: #f1f5f9; --accent: #f59e0b; }
-        body { font-family: 'Cairo', sans-serif; background: var(--bg); margin: 0; padding-bottom: 80px; color: var(--dark); user-select: none; }
-        .container { max-width: 500px; margin: 0 auto; padding: 20px; min-height: 100vh; }
+        :root { --primary: #10b981; --dark: #0f172a; --bg: #f1f5f9; --glass: rgba(255,255,255,0.95); }
+        body { font-family: 'Cairo', sans-serif; background: var(--bg); margin: 0; padding-bottom: 50px; color: var(--dark); user-select: none; }
+        .container { max-width: 500px; margin: 0 auto; min-height: 100vh; position: relative; padding: 20px; }
 
         /* Header */
-        header { text-align: center; margin-bottom: 25px; }
-        .brand { font-size: 28px; font-weight: 900; color: var(--dark); }
-        .brand span { color: var(--main); }
-        .location { font-size: 14px; color: #64748b; font-weight: bold; background: #e2e8f0; padding: 2px 10px; border-radius: 20px; }
+        .app-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; padding-top: 10px; }
+        .brand h1 { margin: 0; font-size: 24px; font-weight: 900; color: var(--dark); }
+        .brand span { color: var(--primary); }
+        .brand p { margin: 0; font-size: 12px; color: #64748b; font-weight: bold; }
+        .user-avatar { width: 40px; height: 40px; background: #e2e8f0; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #64748b; }
 
-        /* الأيقونتان الرئيسيتان */
-        .hero-buttons { display: flex; gap: 15px; margin-bottom: 30px; }
-        .hero-btn { flex: 1; background: white; padding: 20px; border-radius: 20px; text-align: center; box-shadow: 0 10px 20px rgba(0,0,0,0.05); cursor: pointer; border: 2px solid transparent; transition: 0.3s; }
-        .hero-btn i { font-size: 30px; display: block; margin-bottom: 10px; }
-        .hero-btn.player-mode { color: var(--main); border-color: #d1fae5; }
-        .hero-btn.match-mode { color: #3b82f6; border-color: #dbeafe; }
-        .hero-btn:hover, .hero-btn.active { transform: translateY(-5px); background: var(--dark); color: white; border-color: var(--dark); }
+        /* iOS Style Icons Grid */
+        .app-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px; }
+        .app-icon { 
+            background: white; border-radius: 25px; padding: 25px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08); text-align: center; 
+            cursor: pointer; transition: 0.3s; position: relative; overflow: hidden;
+            border: 2px solid transparent; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 140px;
+        }
+        .app-icon:hover { transform: translateY(-5px); box-shadow: 0 15px 35px rgba(0,0,0,0.12); }
+        .app-icon.active { border-color: var(--primary); background: #ecfdf5; }
+        
+        .icon-box { width: 60px; height: 60px; border-radius: 18px; display: flex; align-items: center; justify-content: center; font-size: 28px; margin-bottom: 15px; color: white; box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+        .icon-booking { background: linear-gradient(135deg, #10b981, #059669); }
+        .icon-match { background: linear-gradient(135deg, #3b82f6, #2563eb); }
+        
+        .app-icon h3 { margin: 0; font-size: 16px; font-weight: 800; }
+        .app-icon p { margin: 5px 0 0; font-size: 12px; color: #64748b; }
 
         /* Sections */
-        .page-section { display: none; animation: fadeIn 0.4s; }
-        .page-section.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .section-screen { display: none; background: white; border-radius: 25px; padding: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.05); margin-top: 20px; animation: slideUp 0.3s; }
+        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
-        /* Stadium Cards */
-        .stadium-card { background: white; border-radius: 15px; padding: 15px; margin-bottom: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 2px solid transparent; cursor: pointer; position: relative; }
-        .stadium-card.active { border-color: var(--main); background: #ecfdf5; }
-
-        /* Player Matching Card */
-        .match-player-card { background: white; padding: 15px; border-radius: 12px; margin-bottom: 10px; border-right: 4px solid var(--accent); display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        
         /* Inputs */
-        input, select { width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 12px; margin-bottom: 12px; font-family: 'Cairo'; box-sizing: border-box; outline: none; }
-        
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; font-size: 12px; font-weight: bold; margin-bottom: 5px; color: #64748b; }
+        input, select { width: 100%; padding: 14px; border: 2px solid #f1f5f9; border-radius: 15px; font-family: 'Cairo'; outline: none; transition: 0.3s; box-sizing: border-box; }
+        input:focus, select:focus { border-color: var(--primary); background: #fff; }
+
+        /* Price Tag */
+        .price-display { background: #f0fdf4; border: 1px solid #bbf7d0; color: #166534; padding: 15px; border-radius: 15px; text-align: center; font-weight: bold; margin-bottom: 15px; font-size: 18px; }
+
         /* Time Grid */
         .time-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 10px; }
-        .time-slot { padding: 8px; border: 1px solid #e2e8f0; border-radius: 8px; text-align: center; font-size: 12px; cursor: pointer; }
-        .time-slot.selected { background: var(--main); color: white; border-color: var(--main); }
+        .time-slot { padding: 10px; background: white; border: 1px solid #e2e8f0; border-radius: 10px; text-align: center; font-size: 12px; cursor: pointer; font-weight: bold; }
+        .time-slot.selected { background: var(--primary); color: white; border-color: var(--primary); }
         .time-slot.booked { background: #f1f5f9; color: #cbd5e1; pointer-events: none; text-decoration: line-through; }
 
-        .btn-main { width: 100%; padding: 14px; background: var(--main); color: white; border: none; border-radius: 15px; font-weight: bold; cursor: pointer; font-size: 16px; margin-top: 10px; }
+        .btn-action { width: 100%; padding: 15px; background: var(--dark); color: white; border: none; border-radius: 15px; font-weight: bold; font-size: 16px; cursor: pointer; margin-top: 15px; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        
+        .back-btn { background: none; border: none; font-size: 14px; color: #64748b; cursor: pointer; margin-bottom: 10px; font-weight: bold; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <header>
-        <div class="brand">تسديدة <span>محترف</span></div>
-        <span class="location">محافظة العارضة</span>
-    </header>
-
-    <div class="hero-buttons">
-        <div class="hero-btn player-mode" onclick="showSection('captainMode', this)">
-            <i class="fas fa-search"></i>
-            <div>بحث عن لاعبين<br><small>(للكباتن)</small></div>
+    <div class="app-header">
+        <div class="brand">
+            <h1>تسديدة <span>محترف</span></h1>
+            <p>محافظة العارضة</p>
         </div>
-        <div class="hero-btn match-mode" onclick="showSection('playerMode', this)">
-            <i class="fas fa-futbol"></i>
-            <div>بحث عن مباراة<br><small>(للاعبين)</small></div>
+        <div class="user-avatar"><i class="fas fa-user"></i></div>
+    </div>
+
+    <div id="homeScreen">
+        <h3 style="margin-bottom:15px;">الخدمات الرئيسية</h3>
+        <div class="app-grid">
+            <div class="app-icon" onclick="openSection('bookingScreen')">
+                <div class="icon-box icon-booking"><i class="far fa-calendar-check"></i></div>
+                <h3>حجز ملعب</h3>
+                <p>اختر الوقت واحجز</p>
+            </div>
+
+            <div class="app-icon" onclick="openSection('matchScreen')">
+                <div class="icon-box icon-match"><i class="fas fa-users"></i></div>
+                <h3>بحث عن فريق</h3>
+                <p>لاعبين ومباريات</p>
+            </div>
+        </div>
+
+        <div style="margin-top: 30px; padding: 20px; background: #fff7ed; border-radius: 20px; border: 1px solid #ffedd5;">
+            <h4 style="margin:0 0 5px 0; color:#c2410c;">📣 حالة الطلبات</h4>
+            <div id="myRequests" style="font-size:13px; color:#9a3412;">لا توجد حجوزات نشطة</div>
         </div>
     </div>
 
-    <div id="captainMode" class="page-section">
-        <h3 style="color:var(--dark); margin-top:0;">🏟️ حجز ملعب & استقطاب لاعبين</h3>
+    <div id="bookingScreen" class="section-screen">
+        <button class="back-btn" onclick="goHome()"><i class="fas fa-arrow-right"></i> عودة للقائمة</button>
+        <h2 style="margin-top:0;">🏟️ حجز ملعب جديد</h2>
         
-        <div id="stadiumsList"></div> <div id="bookingForm" style="display:none; background:white; padding:20px; border-radius:20px; margin-top:20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05);">
-            <h4 style="margin:0 0 15px 0; color:var(--main);">تفاصيل الحجز:</h4>
-            
-            <label>نوع الحجز (لتحديد السعر):</label>
+        <div class="form-group">
+            <label>اختر الملعب</label>
+            <select id="stadiumSelect" onchange="loadStadiumDetails()">
+                <option value="">-- اختر الملعب --</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>نوع الحجز (يحدد السعر)</label>
             <select id="priceType" onchange="updatePrice()">
                 <option value="normal">أيام عادية</option>
-                <option value="holiday">عطلة / إجازة</option>
-                <option value="season">موسم / رمضان</option>
+                <option value="holiday">عطلة نهاية الأسبوع</option>
+                <option value="season">مواسم / رمضان</option>
             </select>
-            
-            <div style="background:#f0fdf4; color:#166534; padding:10px; border-radius:10px; margin-bottom:15px; text-align:center; font-weight:bold;" id="finalPriceDisplay">
-                0 ريال / ساعة
-            </div>
+        </div>
 
-            <input type="text" id="capName" placeholder="اسم الكابتن">
+        <div id="priceBox" class="price-display">0 ريال / ساعة</div>
+
+        <div class="form-group">
+            <label>تاريخ الحجز</label>
             <input type="date" id="bookDate" onchange="loadAvailability()">
+        </div>
+
+        <div class="form-group">
+            <label>الساعات المتاحة</label>
             <div id="timeGrid" class="time-grid"></div>
-
-            <div id="matchingPlayersBox" style="margin-top:20px; display:none;">
-                <h4 style="color:#f59e0b; margin-bottom:10px;"><i class="fas fa-star"></i> لاعبون متاحون في هذا الملعب:</h4>
-                <div id="matchingPlayersList"></div>
-            </div>
-
-            <button class="btn-main" onclick="confirmBooking()">تأكيد الحجز وطلب اللاعبين</button>
         </div>
+
+        <div class="form-group">
+            <label>اسم الكابتن</label>
+            <input type="text" id="capName" placeholder="الاسم الثلاثي">
+        </div>
+
+        <button class="btn-action" onclick="submitBooking()">إرسال طلب الحجز <i class="fas fa-paper-plane"></i></button>
     </div>
 
-    <div id="playerMode" class="page-section">
-        <div style="background:white; padding:25px; border-radius:20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05);">
-            <h3 style="margin-top:0; color:#3b82f6;">تسجيل كلاعب متاح 🙋‍♂️</h3>
-            <p style="font-size:13px; color:#64748b;">سجّل بياناتك ليراك الكباتن عند حجز الملعب الذي تفضله.</p>
-            
-            <label>اسمك / اللقب:</label>
-            <input type="text" id="pName" placeholder="مثال: محمد العبدالله">
-            
-            <label>العمر:</label>
-            <input type="number" id="pAge" placeholder="مثال: 24">
-            
-            <label>مركز اللعب:</label>
-            <select id="pPos">
-                <option value="حارس">🧤 حارس</option>
-                <option value="دفاع">🛡️ دفاع</option>
-                <option value="وسط">⚙️ وسط</option>
-                <option value="هجوم">⚽ هجوم</option>
-            </select>
-
-            <label>الملعب الذي ترغب باللعب فيه:</label>
-            <select id="pStadiumTarget">
-                </select>
-
-            <button class="btn-main" style="background:#3b82f6;" onclick="submitPlayerRequest()">نشر ملفي للكباتن ✅</button>
-        </div>
+    <div id="matchScreen" class="section-screen">
+        <button class="back-btn" onclick="goHome()"><i class="fas fa-arrow-right"></i> عودة</button>
+        <h2>⚽ البحث عن فريق/لاعب</h2>
+        
+        <p style="text-align:center; color:#777;">جاري تحميل قائمة المحترفين...</p>
+        <div id="playersList"></div>
     </div>
-
 </div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, collection, addDoc, query, where, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getFirestore, collection, addDoc, query, where, getDocs, doc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyAfn2LhKnsVGQmoAK_HexN_6bm2-NICNSY",
@@ -142,159 +157,94 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
-    
     let currentStadium = null;
     let selectedSlots = [];
-    let adminPhone = "";
 
     async function init() {
-        const conf = await getDoc(doc(db, "settings", "config"));
-        if(conf.exists()) adminPhone = conf.data().adminPhone;
-
-        const sSnap = await getDocs(collection(db, "stadiums"));
-        const sList = document.getElementById('stadiumsList');
-        const pTarget = document.getElementById('pStadiumTarget');
-        
-        sList.innerHTML = '';
-        pTarget.innerHTML = '<option value="أي ملعب">أي ملعب في العارضة</option>';
-
-        sSnap.forEach(d => {
+        const sList = document.getElementById('stadiumSelect');
+        const snap = await getDocs(collection(db, "stadiums"));
+        snap.forEach(d => {
             const st = d.data();
-            st.id = d.id; // نحفظ الـ ID
-            
-            // إضافة للقائمة المنسدلة للاعبين
-            pTarget.innerHTML += `<option value="${st.name}">${st.name}</option>`;
-
-            // إضافة كرت الملعب للكباتن
-            const div = document.createElement('div');
-            div.className = 'stadium-card';
-            div.innerHTML = `
-                <div style="display:flex; justify-content:space-between;">
-                    <h4 style="margin:0;">${st.name}</h4>
-                    <span style="font-size:12px; color:var(--main); font-weight:bold;">${st.priceNormal || 0} ريال</span>
-                </div>
-            `;
-            div.onclick = () => selectStadium(st, div);
-            sList.appendChild(div);
+            sList.innerHTML += `<option value="${d.id}">${st.name}</option>`;
         });
     }
 
-    function selectStadium(st, el) {
-        currentStadium = st;
-        document.querySelectorAll('.stadium-card').forEach(c => c.classList.remove('active'));
-        el.classList.add('active');
-        document.getElementById('bookingForm').style.display = 'block';
-        updatePrice();
-        findMatchingPlayers(); // البحث عن لاعبين لهذا الملعب
+    window.openSection = (id) => {
+        document.getElementById('homeScreen').style.display = 'none';
+        document.getElementById(id).style.display = 'block';
     }
 
-    // تحديث السعر حسب النوع
+    window.goHome = () => {
+        document.querySelectorAll('.section-screen').forEach(s => s.style.display = 'none');
+        document.getElementById('homeScreen').style.display = 'block';
+    }
+
+    window.loadStadiumDetails = async function() {
+        const id = document.getElementById('stadiumSelect').value;
+        if(!id) return;
+        const snap = await getDoc(doc(db, "stadiums", id));
+        currentStadium = snap.data();
+        updatePrice();
+        loadAvailability();
+    }
+
     window.updatePrice = function() {
         if(!currentStadium) return;
         const type = document.getElementById('priceType').value;
-        let price = 0;
-        if(type === 'normal') price = currentStadium.priceNormal || 0;
-        else if(type === 'holiday') price = currentStadium.priceHoliday || 0;
-        else if(type === 'season') price = currentStadium.priceSeason || 0;
+        let p = currentStadium.basePrice || 0;
+        if(type === 'holiday') p = currentStadium.priceHoliday || p;
+        if(type === 'season') p = currentStadium.priceSeason || p;
         
-        document.getElementById('finalPriceDisplay').innerText = `${price} ريال / ساعة`;
-        currentStadium.currentPrice = price; // حفظ السعر الحالي للاستخدام
-    }
-
-    // الربط: البحث عن لاعبين اختاروا نفس الملعب
-    async function findMatchingPlayers() {
-        const box = document.getElementById('matchingPlayersBox');
-        const list = document.getElementById('matchingPlayersList');
-        
-        const q = query(collection(db, "player_requests"), where("stadium", "in", [currentStadium.name, "أي ملعب"]));
-        const snap = await getDocs(q);
-
-        if(snap.empty) {
-            box.style.display = 'none';
-        } else {
-            box.style.display = 'block';
-            list.innerHTML = '';
-            snap.forEach(d => {
-                const p = d.data();
-                list.innerHTML += `
-                    <div class="match-player-card">
-                        <div>
-                            <div style="font-weight:bold;">${p.name} <small>(${p.age} سنة)</small></div>
-                            <span class="pos-tag">${p.pos}</span>
-                        </div>
-                        <button onclick="invitePlayer('${p.name}', '${p.pos}')" style="background:var(--main); color:white; border:none; padding:5px 10px; border-radius:8px; cursor:pointer;">استدعاء</button>
-                    </div>
-                `;
-            });
-        }
-    }
-
-    window.invitePlayer = function(pName, pPos) {
-        const msg = `مرحباً كابتن، أرغب باستدعاء اللاعب *${pName}* (${pPos}) للمشاركة معنا في ${currentStadium.name}.`;
-        window.open(`https://wa.me/${adminPhone}?text=${encodeURIComponent(msg)}`, '_blank');
-    }
-
-    window.submitPlayerRequest = async function() {
-        const name = document.getElementById('pName').value;
-        const age = document.getElementById('pAge').value;
-        const pos = document.getElementById('pPos').value;
-        const stad = document.getElementById('pStadiumTarget').value;
-        
-        if(!name || !age) return alert("أكمل البيانات");
-
-        await addDoc(collection(db, "player_requests"), {
-            name, age, pos, stadium: stad, createdAt: new Date()
-        });
-        alert("تم تسجيلك! سيظهر اسمك للكباتن في " + stad);
-        location.reload();
-    }
-
-    window.showSection = function(id, btn) {
-        document.querySelectorAll('.page-section').forEach(s => s.classList.remove('active'));
-        document.querySelectorAll('.hero-btn').forEach(b => b.classList.remove('active'));
-        document.getElementById(id).classList.add('active');
-        btn.classList.add('active');
+        document.getElementById('priceBox').innerText = `${p} ريال / ساعة`;
+        currentStadium.currentPrice = p;
     }
 
     window.loadAvailability = async function() {
-        // (نفس كود الساعات السابق...)
-        const dateVal = document.getElementById('bookDate').value;
+        const date = document.getElementById('bookDate').value;
+        if(!date || !currentStadium) return;
         const grid = document.getElementById('timeGrid');
-        if(!dateVal) return;
+        grid.innerHTML = '...';
         
         selectedSlots = [];
-        const q = query(collection(db, "bookings"), where("stadiumName", "==", currentStadium.name), where("date", "==", dateVal));
+        const q = query(collection(db, "bookings"), where("stadiumName", "==", currentStadium.name), where("date", "==", date));
         const snap = await getDocs(q);
-        let booked = []; snap.forEach(d => booked.push(...(d.data().bookedSlots || [])));
+        let booked = []; 
+        snap.forEach(d => {
+            // نأخذ الساعات المحجوزة حتى لو كان الطلب "pending" لمنع التضارب
+            if(d.data().bookedSlots) booked.push(...d.data().bookedSlots);
+        });
 
         grid.innerHTML = '';
         for(let h=16; h<=26; h++) {
-            const d = document.createElement('div');
-            d.className = 'time-slot' + (booked.includes(h) ? ' booked' : '');
-            d.innerText = (h%12||12) + ':00';
-            if(!booked.includes(h)) d.onclick = () => {
-                d.classList.toggle('selected');
+            const div = document.createElement('div');
+            div.className = 'time-slot' + (booked.includes(h) ? ' booked' : '');
+            div.innerText = (h%12||12) + ':00';
+            if(!booked.includes(h)) div.onclick = () => {
+                div.classList.toggle('selected');
                 selectedSlots.includes(h) ? selectedSlots = selectedSlots.filter(x=>x!==h) : selectedSlots.push(h);
             };
-            grid.appendChild(d);
+            grid.appendChild(div);
         }
     }
 
-    window.confirmBooking = async function() {
-        // (نفس كود الحجز مع استخدام السعر الحالي)
+    window.submitBooking = async function() {
         const name = document.getElementById('capName').value;
         const date = document.getElementById('bookDate').value;
-        if(!name || selectedSlots.length===0) return alert("أكمل البيانات");
-        
+        if(!name || selectedSlots.length === 0) return alert("الرجاء إكمال البيانات");
+
         const total = selectedSlots.length * currentStadium.currentPrice;
+        
+        // الحفظ بحالة "pending" (بانتظار الموافقة)
         await addDoc(collection(db, "bookings"), {
-            clientName: name, stadiumName: currentStadium.name, date, bookedSlots: selectedSlots,
-            price: total, createdAt: new Date().toISOString()
+            clientName: name, stadiumName: currentStadium.name, date,
+            bookedSlots: selectedSlots, price: total, 
+            status: "pending", // حالة الطلب
+            createdAt: new Date().toISOString()
         });
 
-        const msg = `حجز جديد\n🏟️ ${currentStadium.name}\n👤 ${name}\n💰 ${total} ريال`;
-        window.open(`https://wa.me/${adminPhone}?text=${encodeURIComponent(msg)}`, '_blank');
-        location.reload();
+        alert("✅ تم إرسال الطلب للمالك! ستظهر الموافقة قريباً.");
+        goHome();
+        document.getElementById('myRequests').innerText = `طلب قيد المراجعة: ${currentStadium.name} (${date})`;
     }
 
     init();
