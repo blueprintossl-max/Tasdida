@@ -3,101 +3,101 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tasdida - حجز ملاعب</title>
+    <title>ملاعب العارضة - حجز ومباريات</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root { --primary: #25d366; --dark: #075e54; --bg: #f0f2f5; --selected: #e8f5e9; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg); margin: 0; padding: 15px; padding-bottom: 90px; color: #333; }
-        .container { max-width: 600px; margin: 0 auto; }
+        :root { --primary: #198754; --dark: #1e293b; --bg: #f8fafc; --accent: #f59e0b; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg); margin: 0; padding: 20px; padding-bottom: 100px; color: #333; }
+        .container { max-width: 800px; margin: 0 auto; }
         
-        /* التبويبات */
-        .tabs { display: flex; background: white; padding: 5px; border-radius: 15px; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        .tab-btn { flex: 1; padding: 12px; border: none; background: transparent; cursor: pointer; font-weight: bold; font-size: 16px; color: #777; border-radius: 10px; transition: 0.3s; }
-        .tab-btn.active { background: var(--primary); color: white; }
+        /* الرأس */
+        header { text-align: center; margin-bottom: 30px; }
+        header h1 { color: var(--dark); font-size: 24px; margin: 0; }
+        header p { color: #64748b; margin-top: 5px; }
 
-        /* البطاقات */
-        .card { background: white; padding: 15px; margin-bottom: 15px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border: 2px solid transparent; transition: 0.2s; }
-        .stadium-card { display: flex; align-items: center; gap: 15px; cursor: pointer; }
-        .stadium-card.selected { border-color: var(--primary); background: var(--selected); }
-        .stadium-card img { width: 80px; height: 80px; border-radius: 10px; object-fit: cover; }
-
-        /* شبكة الأوقات */
-        .time-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 10px; }
-        .time-slot { padding: 10px; border: 1px solid #ddd; border-radius: 8px; text-align: center; cursor: pointer; font-size: 13px; background: white; transition: 0.2s; }
-        .time-slot:hover { background: #f9f9f9; }
-        .time-slot.selected { background: var(--primary); color: white; border-color: var(--primary); font-weight: bold; }
-        .time-slot.disabled { background: #eee; color: #aaa; cursor: not-allowed; text-decoration: line-through; }
-
-        /* عناصر التحكم */
-        input, select { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; margin-bottom: 15px; box-sizing: border-box; outline: none; }
-        .bottom-bar { position: fixed; bottom: 0; left: 0; right: 0; background: white; padding: 15px; box-shadow: 0 -4px 15px rgba(0,0,0,0.1); text-align: center; z-index: 100; }
-        .btn-main { background: var(--dark); color: white; border: none; padding: 15px; width: 100%; max-width: 600px; border-radius: 10px; font-size: 18px; font-weight: bold; cursor: pointer; }
+        /* شبكة الملاعب */
+        .stadiums-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 15px; }
+        .stadium-card { background: white; border-radius: 15px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); cursor: pointer; transition: 0.3s; border: 2px solid transparent; }
+        .stadium-card:hover { transform: translateY(-5px); }
+        .stadium-card.selected { border-color: var(--primary); ring: 2px solid var(--primary); }
         
-        /* المراكز */
-        .positions-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 10px; display: none; background: #fff8e1; padding: 10px; border-radius: 8px; }
+        .card-img { height: 160px; background: #eee; position: relative; }
+        .card-img img { width: 100%; height: 100%; object-fit: cover; }
+        .badge-size { position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.7); color: white; padding: 5px 10px; border-radius: 20px; font-size: 12px; font-weight: bold; }
         
-        /* بطاقة المباراة */
-        .match-card { border-right: 5px solid #ff9800; }
-        .btn-join { background: #25d366; color: white; border: none; padding: 8px 15px; border-radius: 5px; margin-top: 10px; width: 100%; font-weight: bold; cursor: pointer; }
+        .card-body { padding: 15px; }
+        .card-title { font-weight: bold; font-size: 18px; margin: 0 0 5px 0; color: var(--dark); }
+        .card-price { color: var(--primary); font-weight: bold; font-size: 16px; float: left; }
+        
+        /* الحجز والوقت */
+        .booking-box { background: white; padding: 20px; border-radius: 15px; margin-top: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .time-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 15px; }
+        .time-slot { padding: 12px; border: 1px solid #e2e8f0; border-radius: 8px; text-align: center; cursor: pointer; font-size: 13px; transition: 0.2s; }
+        .time-slot:hover { background: #f1f5f9; }
+        .time-slot.selected { background: var(--primary); color: white; border-color: var(--primary); }
+        .time-slot.disabled { background: #cbd5e1; color: #94a3b8; cursor: not-allowed; text-decoration: line-through; }
+
+        /* المدخلات */
+        input { width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; margin-bottom: 15px; box-sizing: border-box; outline: none; }
+        
+        /* الشريط السفلي */
+        .bottom-bar { position: fixed; bottom: 0; left: 0; right: 0; background: white; padding: 15px; box-shadow: 0 -4px 20px rgba(0,0,0,0.1); display: flex; align-items: center; justify-content: space-between; z-index: 100; max-width: 800px; margin: 0 auto; border-top-left-radius: 15px; border-top-right-radius: 15px; }
+        .total-price { font-weight: bold; font-size: 18px; color: var(--dark); }
+        .btn-main { background: var(--primary); color: white; border: none; padding: 12px 30px; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 16px; }
+        
+        /* خيار اللاعبين */
+        .player-toggle { display: flex; align-items: center; gap: 10px; background: #fff7ed; padding: 10px; border-radius: 8px; border: 1px solid #ffedd5; margin-top: 15px; }
+        .positions-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 10px; display: none; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2 style="text-align: center; color: var(--dark); margin-bottom: 20px;">⚽ تطبيق Tasdida</h2>
+    <header>
+        <h1>⚽ ملاعب العارضة</h1>
+        <p>احجز ملعبك المفضل في ثوانٍ</p>
+    </header>
 
-    <div class="tabs">
-        <button class="tab-btn active" onclick="switchTab('booking')">حجز ملعب 🏟️</button>
-        <button class="tab-btn" onclick="switchTab('matches')">انضم لفريق 🤝</button>
-    </div>
+    <h3 style="margin-bottom:15px;"><i class="fas fa-map-marker-alt"></i> اختر الملعب:</h3>
+    <div id="stadiumsList" class="stadiums-grid"></div>
 
-    <div id="bookingSection">
-        <div class="card">
-            <label>👤 اسم الكابتن:</label>
-            <input type="text" id="clientName" placeholder="الاسم الثلاثي">
-            
-            <label>📅 تاريخ الحجز:</label>
-            <input type="date" id="bookingDate" onchange="loadAvailableTimes()">
+    <div id="bookingSection" class="booking-box" style="display:none;">
+        <h3 id="selectedStadiumTitle" style="margin-top:0; border-bottom:1px solid #eee; padding-bottom:10px;"></h3>
+        
+        <label><i class="fas fa-user"></i> اسم الكابتن:</label>
+        <input type="text" id="clientName" placeholder="الاسم الثلاثي">
+        
+        <label><i class="fas fa-calendar-alt"></i> تاريخ الحجز:</label>
+        <input type="date" id="bookingDate" onchange="loadAvailableTimes()">
 
-            <label>⏰ اختر الساعات المطلوبة (يمكنك اختيار أكثر من ساعة):</label>
-            <div id="timeGrid" class="time-grid">
-                <p style="grid-column: span 4; text-align:center; color:#777;">اختر التاريخ والملعب أولاً لعرض الأوقات</p>
-            </div>
-            <p id="totalPriceDisplay" style="text-align:center; font-weight:bold; color:var(--dark); margin-top:10px;">الإجمالي: 0 ريال</p>
-
-            <div style="margin-top: 15px; border-top: 1px solid #eee; padding-top: 10px;">
-                <label style="display:flex; align-items:center; cursor:pointer; gap:10px;">
-                    <input type="checkbox" id="needsPlayers" onchange="togglePositions()" style="width: 20px; height: 20px;">
-                    <span style="font-weight:bold; color:#d35400;">فريقي ناقص وأحتاج لاعبين!</span>
-                </label>
-                
-                <div id="positionsBox" class="positions-grid">
-                    <p style="grid-column: span 2; margin:0 0 5px 0; font-size:12px;">حدد المراكز الناقصة:</p>
-                    <label><input type="checkbox" value="حارس" class="pos-select"> 🧤 حارس</label>
-                    <label><input type="checkbox" value="دفاع" class="pos-select"> 🛡️ دفاع</label>
-                    <label><input type="checkbox" value="وسط" class="pos-select"> ⚙️ وسط</label>
-                    <label><input type="checkbox" value="هجوم" class="pos-select"> ⚽ هجوم</label>
-                </div>
-            </div>
+        <label style="display:block; margin-top:10px;"><i class="fas fa-clock"></i> الساعات المتاحة:</label>
+        <div id="timeGrid" class="time-grid">
+            <p style="grid-column:span 4; text-align:center; color:#777;">اختر التاريخ أولاً</p>
         </div>
 
-        <h3 style="margin: 10px 0;">اختر الملعب:</h3>
-        <div id="stadiumsList"></div>
-    </div>
-
-    <div id="matchesSection" style="display: none;">
-        <div id="matchesList"></div>
+        <div class="player-toggle">
+            <input type="checkbox" id="needsPlayers" onchange="togglePositions()" style="width:20px; margin:0;">
+            <span style="color:#c2410c; font-weight:bold;">ينقصنا لاعبين للمباراة؟</span>
+        </div>
+        <div id="positionsBox" class="positions-grid">
+            <label><input type="checkbox" value="حارس" class="pos-select"> 🧤 حارس</label>
+            <label><input type="checkbox" value="دفاع" class="pos-select"> 🛡️ دفاع</label>
+            <label><input type="checkbox" value="وسط" class="pos-select"> ⚙️ وسط</label>
+            <label><input type="checkbox" value="هجوم" class="pos-select"> ⚽ هجوم</label>
+        </div>
     </div>
 </div>
 
-<div class="bottom-bar" id="bottomBar">
-    <button id="bookBtn" class="btn-main" onclick="processBooking()">تأكيد الحجز وإرسال الطلب ✅</button>
+<div class="bottom-bar" id="bottomBar" style="display:none;">
+    <div class="total-price" id="totalPriceDisplay">0 ريال</div>
+    <button id="bookBtn" class="btn-main" onclick="processBooking()">تأكيد الحجز <i class="fas fa-check-circle"></i></button>
 </div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getFirestore, collection, addDoc, query, where, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-    // 🔴 تم دمج الكود الخاص بك هنا بنجاح 🔴
+    // 🔴 كود الربط الخاص بك 🔴
     const firebaseConfig = {
       apiKey: "AIzaSyAfn2LhKnsVGQmoAK_HexN_6bm2-NICNSY",
       authDomain: "tasdida.firebaseapp.com",
@@ -111,55 +111,67 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    // متغيرات النظام
+    // متغيرات
     let adminPhone = "";
-    let workStart = 16; // افتراضي: 4 مساءً
-    let workEnd = 26;   // افتراضي: 2 فجراً
+    let workStart = 16;
+    let workEnd = 26;
     let selectedStadium = null;
-    let selectedTimes = []; 
+    let selectedTimes = [];
 
     // جلب الإعدادات
-    async function loadSettings() {
-        try {
-            const snap = await getDoc(doc(db, "settings", "config"));
-            if(snap.exists()) {
-                const data = snap.data();
-                if(data.adminPhone) adminPhone = data.adminPhone;
-                if(data.workStart) workStart = Number(data.workStart);
-                if(data.workEnd) workEnd = Number(data.workEnd);
-            }
-        } catch(e) { console.log("Using defaults"); }
-    }
-    loadSettings();
-
-    const stadiums = [
-        { id: 1, name: "ملعب الجوهرة (الشمال)", price: 150, img: "https://images.unsplash.com/photo-1575361204480-aadea25e6e68?w=200" },
-        { id: 2, name: "ملعب الكامب نو (الشرق)", price: 200, img: "https://images.unsplash.com/photo-1522770179533-24471fcdba45?w=200" },
-        { id: 3, name: "ملعب الأولمبي (الوسط)", price: 120, img: "https://images.unsplash.com/photo-1459865264687-595d652de67e?w=200" }
-    ];
-
-    // رسم الملاعب
-    const stContainer = document.getElementById('stadiumsList');
-    stadiums.forEach(st => {
-        const div = document.createElement('div');
-        div.className = 'card stadium-card';
-        div.onclick = () => {
-            selectedStadium = st;
-            document.querySelectorAll('.stadium-card').forEach(c => c.classList.remove('selected'));
-            div.classList.add('selected');
-            loadAvailableTimes();
-        };
-        div.innerHTML = `
-            <img src="${st.img}">
-            <div style="flex:1">
-                <h3 style="margin:0;">${st.name}</h3>
-                <span style="color:#25d366; font-weight:bold;">${st.price} ريال / ساعة</span>
-            </div>
-        `;
-        stContainer.appendChild(div);
+    getDoc(doc(db, "settings", "config")).then(snap => {
+        if(snap.exists()) {
+            const d = snap.data();
+            adminPhone = d.adminPhone;
+            if(d.workStart) workStart = Number(d.workStart);
+            if(d.workEnd) workEnd = Number(d.workEnd);
+        }
     });
 
-    // تحويل الوقت
+    // 🏟️ قائمة ملاعب العارضة (بيانات تقديرية)
+    const stadiums = [
+        { id: 1, name: "ملعب الشلال", price: 150, size: "7 vs 7", img: "https://images.unsplash.com/photo-1529900748604-07564a03e7a6?w=400" },
+        { id: 2, name: "ملعب الأسطورة", price: 140, size: "6 vs 6", img: "https://images.unsplash.com/photo-1575361204480-aadea25e6e68?w=400" },
+        { id: 3, name: "ملعب النخبة", price: 160, size: "8 vs 8", img: "https://images.unsplash.com/photo-1459865264687-595d652de67e?w=400" },
+        { id: 4, name: "ملعب التحدي", price: 130, size: "5 vs 5", img: "https://images.unsplash.com/photo-1522770179533-24471fcdba45?w=400" },
+        { id: 5, name: "ملعب أكاديمية العارضة", price: 180, size: "9 vs 9", img: "https://images.unsplash.com/photo-1518605348435-2242085dbb3c?w=400" },
+        { id: 6, name: "ملعب القمة", price: 150, size: "7 vs 7", img: "https://images.unsplash.com/photo-1556612000-848e02927284?w=400" }
+    ];
+
+    // رسم البطاقات
+    const container = document.getElementById('stadiumsList');
+    stadiums.forEach(st => {
+        const div = document.createElement('div');
+        div.className = 'stadium-card';
+        div.onclick = () => selectStadium(st, div);
+        div.innerHTML = `
+            <div class="card-img">
+                <img src="${st.img}" alt="${st.name}">
+                <span class="badge-size"><i class="fas fa-users"></i> ${st.size}</span>
+            </div>
+            <div class="card-body">
+                <h3 class="card-title">${st.name}</h3>
+                <span class="card-price">${st.price} ريال / ساعة</span>
+                <div style="clear:both;"></div>
+            </div>
+        `;
+        container.appendChild(div);
+    });
+
+    function selectStadium(st, element) {
+        selectedStadium = st;
+        document.querySelectorAll('.stadium-card').forEach(c => c.classList.remove('selected'));
+        element.classList.add('selected');
+        
+        document.getElementById('bookingSection').style.display = 'block';
+        document.getElementById('bottomBar').style.display = 'flex';
+        document.getElementById('selectedStadiumTitle').innerText = `حجز: ${st.name}`;
+        
+        // التمرير للأسفل قليلاً
+        document.getElementById('bookingSection').scrollIntoView({behavior: "smooth"});
+        loadAvailableTimes();
+    }
+
     function formatTime(hour) {
         let h = hour % 24;
         let suffix = (h >= 12) ? 'م' : 'ص';
@@ -168,14 +180,13 @@
         return `${h}:00 ${suffix}`;
     }
 
-    // توليد شبكة الأوقات
     window.loadAvailableTimes = async function() {
         const date = document.getElementById('bookingDate').value;
         const grid = document.getElementById('timeGrid');
         
         if(!date || !selectedStadium) return;
 
-        grid.innerHTML = '<p style="grid-column:span 4; text-align:center">جاري التحقق...</p>';
+        grid.innerHTML = '<p style="grid-column:span 4; text-align:center"><i class="fas fa-spinner fa-spin"></i> جاري التحقق...</p>';
         selectedTimes = [];
         updatePrice();
 
@@ -198,15 +209,15 @@
             
             if(bookedHours.includes(actualHour)) {
                 btn.classList.add('disabled');
-                btn.innerText += " (محجوز)";
+                btn.style.opacity = "0.5";
             } else {
-                btn.onclick = () => toggleTimeSelection(btn, actualHour);
+                btn.onclick = () => toggleTime(btn, actualHour);
             }
             grid.appendChild(btn);
         }
     }
 
-    function toggleTimeSelection(btn, hour) {
+    function toggleTime(btn, hour) {
         if(btn.classList.contains('disabled')) return;
         if(btn.classList.contains('selected')) {
             btn.classList.remove('selected');
@@ -221,22 +232,13 @@
     function updatePrice() {
         if(selectedStadium) {
             const total = selectedTimes.length * selectedStadium.price;
-            document.getElementById('totalPriceDisplay').innerText = `الإجمالي: ${total} ريال (${selectedTimes.length} ساعات)`;
+            document.getElementById('totalPriceDisplay').innerText = `الإجمالي: ${total} ريال`;
         }
     }
 
     window.togglePositions = function() {
         const box = document.getElementById('positionsBox');
         box.style.display = document.getElementById('needsPlayers').checked ? 'grid' : 'none';
-    }
-
-    window.switchTab = function(tab) {
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        event.target.classList.add('active');
-        document.getElementById('bookingSection').style.display = tab === 'booking' ? 'block' : 'none';
-        document.getElementById('matchesSection').style.display = tab === 'matches' ? 'block' : 'none';
-        document.getElementById('bottomBar').style.display = tab === 'booking' ? 'block' : 'none';
-        if(tab === 'matches') loadMatches();
     }
 
     window.processBooking = async function() {
@@ -248,10 +250,10 @@
         let wantedPositions = [];
         if(needsPlayers) document.querySelectorAll('.pos-select:checked').forEach(cb => wantedPositions.push(cb.value));
 
-        if(!name || !date || !selectedStadium || selectedTimes.length === 0) return alert("⚠️ أكمل البيانات واختر ساعة واحدة على الأقل");
+        if(!name || !date || selectedTimes.length === 0) return alert("⚠️ الرجاء إكمال البيانات واختيار الوقت");
 
         btn.disabled = true;
-        btn.innerText = "جاري الحجز...";
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الحجز...';
 
         try {
             const totalPrice = selectedTimes.length * selectedStadium.price;
@@ -272,43 +274,18 @@
                 createdAt: new Date().toISOString()
             });
 
-            alert("✅ تم إرسال طلبك للتأكيد!");
-            
-            let msg = `طلب حجز جديد 🆕\n🏟️ ${selectedStadium.name}\n👤 ${name}\n📅 ${date}\n⏰ الأوقات: ${timeString}\n💰 الإجمالي: ${totalPrice} ريال`;
-            if(needsPlayers) msg += `\n⚠️ مطلوب لاعبين: ${wantedPositions.join('، ')}`;
+            // رسالة الواتساب
+            let msg = `*حجز جديد - ${selectedStadium.name}* 🏟️\n👤 الاسم: ${name}\n📅 التاريخ: ${date}\n⏰ الوقت: ${timeString}\n💰 المبلغ: ${totalPrice} ريال`;
+            if(needsPlayers) msg += `\n⚠️ *مطلوب لاعبين:* ${wantedPositions.join(' - ')}`;
             
             window.open(`https://wa.me/${adminPhone}?text=${encodeURIComponent(msg)}`, '_blank');
             location.reload();
 
         } catch (e) {
             console.error(e);
-            alert("خطأ في الاتصال");
+            alert("حدث خطأ في الاتصال");
             btn.disabled = false;
         }
-    }
-
-    async function loadMatches() {
-        const list = document.getElementById('matchesList');
-        list.innerHTML = '<p style="text-align:center">جاري البحث...</p>';
-        const q = query(collection(db, "bookings"), where("needsPlayers", "==", true));
-        const snap = await getDocs(q);
-        list.innerHTML = '';
-        if(snap.empty) { list.innerHTML = '<p style="text-align:center">لا توجد مباريات متاحة.</p>'; return; }
-
-        snap.forEach(doc => {
-            const data = doc.data();
-            if(new Date(data.date) >= new Date().setHours(0,0,0,0)) {
-                let posHtml = data.wantedPositions ? data.wantedPositions.map(p=>`<span style="background:#ff9800;color:white;padding:2px 6px;border-radius:4px;font-size:12px;margin:2px;">${p}</span>`).join('') : '';
-                list.innerHTML += `
-                    <div class="card match-card">
-                        <h3>${data.stadiumName}</h3>
-                        <p>📅 ${data.date} | ⏰ ${data.timeDisplay}</p>
-                        <p>👤 الكابتن: ${data.clientName}</p>
-                        <div><strong>مطلوب:</strong> ${posHtml}</div>
-                        <button class="btn-join" onclick="window.open('https://wa.me/${adminPhone}?text=أريد الانضمام لمباراة ${data.clientName}', '_blank')">📩 انضمام</button>
-                    </div>`;
-            }
-        });
     }
 </script>
 </body>
