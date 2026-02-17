@@ -2,154 +2,215 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>تسديدة محترف | Pro Striker</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
-        :root { --primary: #10b981; --secondary: #3b82f6; --dark: #0f172a; --bg: #f8fafc; }
-        body { font-family: 'Cairo', sans-serif; background: var(--bg); margin: 0; padding-bottom: 50px; color: var(--dark); user-select: none; }
-        .container { max-width: 500px; margin: 0 auto; min-height: 100vh; position: relative; padding: 20px; }
+        :root {
+            --primary: #006847; /* الأخضر السعودي */
+            --primary-dark: #004d34;
+            --accent: #bfaa65; /* الذهبي */
+            --dark: #1e293b;
+            --light: #f8fafc;
+            --glass: rgba(255, 255, 255, 0.95);
+            --shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.1);
+        }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { font-family: 'Tajawal', sans-serif; background: #f1f5f9; margin: 0; padding-bottom: 90px; color: var(--dark); }
+        
+        .container { max-width: 500px; margin: 0 auto; padding: 20px; min-height: 100vh; position: relative; }
 
         /* Header */
-        .app-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; padding-top: 10px; }
-        .brand h1 { margin: 0; font-size: 24px; font-weight: 900; color: var(--dark); }
-        .brand span { color: var(--primary); }
-        .user-avatar { width: 40px; height: 40px; background: #e2e8f0; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #64748b; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; padding-top: 10px; }
+        .logo h1 { margin: 0; font-size: 26px; font-weight: 900; color: var(--primary); letter-spacing: -1px; }
+        .logo span { color: var(--accent); }
+        .logo p { margin: 0; font-size: 11px; font-weight: bold; color: #64748b; letter-spacing: 1px; }
+        .profile-btn { width: 45px; height: 45px; background: white; border-radius: 14px; display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow); color: var(--primary); font-size: 20px; }
 
-        /* iOS Icons */
-        .app-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
-        .app-icon { 
-            background: white; border-radius: 20px; padding: 20px; 
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05); text-align: center; 
-            cursor: pointer; transition: 0.2s; height: 130px; display: flex; flex-direction: column; align-items: center; justify-content: center;
+        /* Hero Cards (The Main Buttons) */
+        .hero-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px; }
+        .hero-card { 
+            background: white; border-radius: 20px; padding: 20px; text-align: center; 
+            box-shadow: var(--shadow); cursor: pointer; transition: 0.3s; 
+            border: 2px solid transparent; position: relative; overflow: hidden;
         }
-        .app-icon:active { transform: scale(0.95); }
-        .icon-box { width: 50px; height: 50px; border-radius: 15px; display: flex; align-items: center; justify-content: center; font-size: 24px; margin-bottom: 10px; color: white; }
-        .icon-booking { background: linear-gradient(135deg, #10b981, #059669); }
-        .icon-find-player { background: linear-gradient(135deg, #f59e0b, #d97706); } /* برتقالي */
-        .icon-find-match { background: linear-gradient(135deg, #3b82f6, #2563eb); } /* أزرق */
+        .hero-card:active { transform: scale(0.96); }
+        .hero-card.active { border-color: var(--primary); background: #f0fdf4; }
+        .hero-card i { font-size: 32px; margin-bottom: 10px; display: block; background: linear-gradient(45deg, var(--primary), var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .hero-card h3 { margin: 0; font-size: 16px; font-weight: 800; }
+        .hero-card p { margin: 5px 0 0; font-size: 11px; color: #64748b; }
 
-        /* Screens */
-        .screen { display: none; animation: slideUp 0.3s; }
-        .screen.active { display: block; }
+        /* Section Containers */
+        .section { display: none; animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+        .section.active { display: block; }
         @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
-        /* Request Cards */
-        .req-card { background: white; padding: 15px; border-radius: 15px; margin-bottom: 10px; border-right: 4px solid #ddd; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
-        .req-card.player { border-color: #3b82f6; } /* طلب لاعب */
-        .req-card.match { border-color: #f59e0b; } /* طلب مباراة */
-        .pos-badge { font-size: 11px; padding: 3px 8px; border-radius: 5px; background: #f1f5f9; font-weight: bold; }
+        /* Forms & Inputs */
+        .form-box { background: white; padding: 25px; border-radius: 24px; box-shadow: var(--shadow); }
+        .input-group { margin-bottom: 15px; }
+        .input-group label { display: block; font-size: 13px; font-weight: bold; margin-bottom: 8px; color: #475569; }
+        input, select { width: 100%; padding: 16px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 16px; font-family: inherit; font-size: 14px; font-weight: 600; outline: none; transition: 0.3s; }
+        input:focus, select:focus { border-color: var(--primary); background: white; box-shadow: 0 0 0 4px rgba(0, 104, 71, 0.1); }
 
-        /* Floating Action Button */
-        .fab { position: fixed; bottom: 30px; left: 30px; width: 55px; height: 55px; background: var(--dark); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 20px rgba(0,0,0,0.2); cursor: pointer; z-index: 100; font-size: 20px; }
+        /* Time Grid */
+        .time-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 10px; }
+        .time-slot { padding: 12px 5px; background: white; border: 1px solid #e2e8f0; border-radius: 12px; text-align: center; font-size: 12px; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        .time-slot.selected { background: var(--primary); color: white; border-color: var(--primary); }
+        .time-slot.booked { background: #f1f5f9; color: #cbd5e1; text-decoration: line-through; pointer-events: none; }
 
-        /* Modal */
-        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 2000; align-items: center; justify-content: center; padding: 20px; }
-        .modal-content { background: white; padding: 25px; border-radius: 20px; width: 100%; max-width: 350px; }
+        /* Matchmaking Cards */
+        .match-card { background: white; border-radius: 18px; padding: 15px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; border-right: 4px solid var(--primary); box-shadow: 0 2px 10px rgba(0,0,0,0.03); }
+        .match-card.wanted { border-right-color: var(--accent); } /* لون مختلف لطلب اللاعبين */
+        
+        .role-tag { padding: 4px 10px; border-radius: 8px; font-size: 10px; font-weight: bold; background: #f1f5f9; color: #475569; }
 
-        input, select { width: 100%; padding: 12px; border: 2px solid #f1f5f9; border-radius: 12px; margin-bottom: 10px; font-family: 'Cairo'; outline: none; box-sizing: border-box; }
-        .btn { width: 100%; padding: 12px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; margin-top: 10px; }
-        .btn-primary { background: var(--primary); color: white; }
-        .back-btn { background: none; border: none; font-weight: bold; color: #64748b; cursor: pointer; margin-bottom: 15px; display: flex; align-items: center; gap: 5px; }
+        /* Floating Button */
+        .fab { position: fixed; bottom: 25px; left: 25px; width: 60px; height: 60px; background: var(--primary); color: white; border-radius: 20px; display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: 0 10px 20px rgba(0, 104, 71, 0.3); z-index: 100; cursor: pointer; transition: 0.3s; }
+        .fab:active { transform: scale(0.9); }
+
+        /* Modals */
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(5px); z-index: 2000; display: none; align-items: center; justify-content: center; padding: 20px; }
+        .modal-card { background: white; width: 100%; max-width: 400px; padding: 30px; border-radius: 30px; text-align: center; animation: popIn 0.3s; }
+        @keyframes popIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+        .btn-main { width: 100%; padding: 16px; background: var(--primary); color: white; border: none; border-radius: 16px; font-weight: bold; font-size: 16px; cursor: pointer; margin-top: 15px; }
+        .btn-sec { background: #f1f5f9; color: var(--dark); margin-top: 10px; }
+
+        /* Tabs inside Social Section */
+        .social-tabs { display: flex; background: #e2e8f0; padding: 5px; border-radius: 16px; margin-bottom: 20px; }
+        .social-tab { flex: 1; padding: 12px; text-align: center; border-radius: 12px; font-weight: bold; font-size: 13px; cursor: pointer; transition: 0.3s; color: #64748b; }
+        .social-tab.active { background: white; color: var(--primary); box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+
     </style>
 </head>
 <body>
 
 <div class="container">
-    <div class="app-header">
-        <div class="brand">
+    <header class="header">
+        <div class="logo">
             <h1>تسديدة <span>محترف</span></h1>
-            <p>محافظة العارضة</p>
+            <p>المملكة العربية السعودية <i class="fas fa-check-circle" style="color:#3b82f6;"></i></p>
         </div>
-        <div class="user-avatar"><i class="fas fa-user"></i></div>
+        <div class="profile-btn"><i class="far fa-user"></i></div>
+    </header>
+
+    <div class="hero-grid">
+        <div class="hero-card" onclick="openSection('bookingSection', this)">
+            <i class="far fa-calendar-check"></i>
+            <h3>حجز ملعب</h3>
+            <p>احجز ساعتك الآن</p>
+        </div>
+        <div class="hero-card" onclick="openSection('socialSection', this)">
+            <i class="fas fa-users"></i>
+            <h3>مجتمع اللاعبين</h3>
+            <p>ابحث عن فريق أو مباراة</p>
+        </div>
     </div>
 
-    <div id="homeScreen" class="screen active">
-        <div class="app-grid">
-            <div class="app-icon" onclick="alert('صفحة الحجز متاحة في الكود السابق')">
-                <div class="icon-box icon-booking"><i class="fas fa-calendar-check"></i></div>
-                <h3>حجز ملعب</h3>
-            </div>
+    <div id="bookingSection" class="section">
+        <div class="form-box">
+            <h3 style="margin-top:0;">🏟️ بيانات الحجز</h3>
             
-            <div class="app-icon" onclick="openScreen('findPlayerScreen')">
-                <div class="icon-box icon-find-player"><i class="fas fa-search"></i></div>
-                <h3>أبحث عن لاعبين</h3>
-                <p>للكباتن</p>
+            <div class="input-group">
+                <label>اختر الملعب</label>
+                <select id="stadiumSelect" onchange="loadStadiumData()">
+                    <option value="">-- اختر الملعب --</option>
+                    </select>
             </div>
 
-            <div class="app-icon" onclick="openScreen('findMatchScreen')">
-                <div class="icon-box icon-find-match"><i class="fas fa-running"></i></div>
-                <h3>أبحث عن مباراة</h3>
-                <p>للاعبين</p>
+            <div id="priceTag" style="background:#f0fdf4; color:var(--primary); padding:15px; border-radius:12px; text-align:center; font-weight:bold; margin-bottom:15px; display:none;">
+                0 ريال / ساعة
             </div>
+
+            <div class="input-group">
+                <label>تاريخ اللعب</label>
+                <input type="date" id="bookDate" onchange="loadAvailability()">
+            </div>
+
+            <div class="input-group">
+                <label>الساعات المتاحة</label>
+                <div id="timeGrid" class="time-grid"></div>
+            </div>
+
+            <div class="input-group">
+                <label>اسم الكابتن (صاحب الحجز)</label>
+                <input type="text" id="capName" placeholder="الاسم الثلاثي">
+            </div>
+
+            <button class="btn-main" onclick="submitBooking()">إرسال الطلب <i class="fas fa-paper-plane"></i></button>
         </div>
     </div>
 
-    <div id="findPlayerScreen" class="screen">
-        <button class="back-btn" onclick="goHome()"><i class="fas fa-arrow-right"></i> الرئيسية</button>
-        <h2 style="color:#f59e0b;">🕵️‍♂️ قائمة اللاعبين المتاحين</h2>
-        <p style="font-size:12px; color:#64748b;">هؤلاء لاعبون سجلوا أنهم "متاحون" للعب.</p>
+    <div id="socialSection" class="section">
         
-        <div id="availablePlayersList"></div>
+        <div class="social-tabs">
+            <div class="social-tab active" onclick="switchSocialTab('matches')">⚽ أبحث عن مباراة</div>
+            <div class="social-tab" onclick="switchSocialTab('players')">🔍 أبحث عن لاعبين</div>
+        </div>
 
-        <div class="fab" onclick="openModal('reqPlayerModal')"><i class="fas fa-plus"></i></div>
+        <div id="tabMatches" class="social-content">
+            <h4 style="margin:0 0 15px 0; color:#64748b;">مباريات تنقصها لاعبين (طلبات الكباتن)</h4>
+            <div id="captainRequestsList">
+                <p style="text-align:center; font-size:12px; color:#999;">جاري التحميل...</p>
+            </div>
+            <div class="fab" onclick="openModal('addPlayerModal')"><i class="fas fa-hand-paper"></i></div>
+        </div>
+
+        <div id="tabPlayers" class="social-content" style="display:none;">
+            <h4 style="margin:0 0 15px 0; color:#64748b;">لاعبون محترفون متاحون (جاهزون للعب)</h4>
+            <div id="availablePlayersList"></div>
+            <div class="fab" style="background:var(--accent);" onclick="openModal('addMatchModal')"><i class="fas fa-bullhorn"></i></div>
+        </div>
     </div>
 
-    <div id="findMatchScreen" class="screen">
-        <button class="back-btn" onclick="goHome()"><i class="fas fa-arrow-right"></i> الرئيسية</button>
-        <h2 style="color:#3b82f6;">⚽ مباريات تنقصها لاعبين</h2>
-        <p style="font-size:12px; color:#64748b;">هذه طلبات الكباتن، اضغط للتواصل معهم.</p>
-
-        <div id="captainRequestsList"></div>
-
-        <div class="fab" onclick="openModal('iamAvailableModal')"><i class="fas fa-user-plus"></i></div>
-    </div>
 </div>
 
-<div id="reqPlayerModal" class="modal">
-    <div class="modal-content">
-        <h3>📢 طلب لاعب جديد (للكباتن)</h3>
-        <input type="text" id="cpName" placeholder="اسم الكابتن">
-        <select id="cpPos">
-            <option value="">المركز المطلوب؟</option>
+<div id="addMatchModal" class="modal-overlay">
+    <div class="modal-card">
+        <h3>📢 كابتن، من ينقصك؟</h3>
+        <input type="text" id="reqCptName" placeholder="اسم الكابتن" style="margin-bottom:10px;">
+        <select id="reqPos" style="margin-bottom:10px;">
             <option value="حارس">🧤 حارس</option>
             <option value="دفاع">🛡️ دفاع</option>
             <option value="وسط">⚙️ وسط</option>
             <option value="هجوم">⚽ هجوم</option>
         </select>
-        <select id="cpStadium">
+        <select id="reqStadium" style="margin-bottom:10px;">
             <option value="ملعب البلدية">ملعب البلدية</option>
             <option value="ملعب الرواد">ملعب الرواد</option>
             <option value="ملعب المشاف">ملعب المشاف</option>
         </select>
-        <input type="text" id="cpTime" placeholder="وقت المباراة (مثال: الليلة 9م)">
-        <button class="btn btn-primary" onclick="postCaptainRequest()">نشر الطلب</button>
-        <button class="btn" style="background:#eee;" onclick="closeModals()">إغلاق</button>
+        <input type="text" id="reqTime" placeholder="الوقت (مثال: الليلة 9م)" style="margin-bottom:10px;">
+        <button class="btn-main" onclick="postCaptainRequest()">نشر الطلب</button>
+        <button class="btn-main btn-sec" onclick="closeModals()">إلغاء</button>
     </div>
 </div>
 
-<div id="iamAvailableModal" class="modal">
-    <div class="modal-content">
-        <h3>🙋‍♂️ أنا متاح للعب (للاعبين)</h3>
-        <input type="text" id="plName" placeholder="اسمك">
-        <select id="plPos">
-            <option value="">مركزك؟</option>
+<div id="addPlayerModal" class="modal-overlay">
+    <div class="modal-card">
+        <h3>🙋‍♂️ سجل نفسك كلاعب متاح</h3>
+        <input type="text" id="plName" placeholder="اسمك / اللقب" style="margin-bottom:10px;">
+        <input type="number" id="plAge" placeholder="العمر" style="margin-bottom:10px;">
+        <select id="plPos" style="margin-bottom:10px;">
             <option value="حارس">🧤 حارس</option>
             <option value="دفاع">🛡️ دفاع</option>
             <option value="وسط">⚙️ وسط</option>
             <option value="هجوم">⚽ هجوم</option>
         </select>
-        <input type="text" id="plPhone" placeholder="رقم جوالك">
-        <button class="btn btn-primary" onclick="postPlayerAvailability()">نشر ملفي</button>
-        <button class="btn" style="background:#eee;" onclick="closeModals()">إغلاق</button>
+        <input type="tel" id="plPhone" placeholder="رقم الجوال (للتواصل)" style="margin-bottom:10px;">
+        <button class="btn-main" onclick="postPlayerAvailability()">أنا جاهز للعب</button>
+        <button class="btn-main btn-sec" onclick="closeModals()">إلغاء</button>
     </div>
 </div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, collection, addDoc, getDocs, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getFirestore, collection, addDoc, getDocs, query, where, doc, getDoc, onSnapshot, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
+    // ⚠️ استبدل هذا الجزء ببياناتك من Firebase Console
     const firebaseConfig = {
       apiKey: "AIzaSyAfn2LhKnsVGQmoAK_HexN_6bm2-NICNSY",
       authDomain: "tasdida.firebaseapp.com",
@@ -162,85 +223,181 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    // التنقل
-    window.openScreen = (id) => {
-        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-        document.getElementById(id).classList.add('active');
-    }
-    window.goHome = () => openScreen('homeScreen');
-    window.openModal = (id) => document.getElementById(id).style.display = 'flex';
-    window.closeModals = () => document.querySelectorAll('.modal').forEach(m => m.style.display = 'none');
+    let selectedStadium = null;
+    let selectedSlots = [];
+    let adminPhone = "";
 
-    // 1. الكابتن ينشر طلب (يحتاج لاعب)
-    window.postCaptainRequest = async () => {
-        const name = document.getElementById('cpName').value;
-        const pos = document.getElementById('cpPos').value;
-        const stad = document.getElementById('cpStadium').value;
-        const time = document.getElementById('cpTime').value;
+    // --- التهيئة ---
+    async function init() {
+        const sSelect = document.getElementById('stadiumSelect');
+        const snap = await getDocs(collection(db, "stadiums"));
         
-        if(!name || !pos) return alert("البيانات ناقصة");
-        
-        await addDoc(collection(db, "captain_requests"), {
-            captainName: name, positionNeeded: pos, stadium: stad, time: time, createdAt: new Date()
+        // جلب رقم الإدارة
+        const conf = await getDoc(doc(db, "settings", "config"));
+        if(conf.exists()) adminPhone = conf.data().adminPhone;
+
+        // ملء القائمة
+        if(snap.empty) {
+            // إضافة تلقائية لأول مرة
+            await addDoc(collection(db, "stadiums"), {name: "ملعب البلدية", priceNormal: 150, priceHoliday: 200});
+            location.reload();
+        }
+
+        sSelect.innerHTML = '<option value="">-- اختر الملعب --</option>';
+        snap.forEach(d => {
+            const st = d.data();
+            const opt = document.createElement('option');
+            opt.value = d.id;
+            opt.text = st.name;
+            opt.dataset.price = st.priceNormal || 0;
+            sSelect.add(opt);
         });
-        alert("تم نشر طلبك! سيراه اللاعبون في 'البحث عن مباراة'");
+
+        // تشغيل المستمعين للبيانات الاجتماعية
+        listenToSocial();
+    }
+
+    // --- واجهة المستخدم ---
+    window.openSection = (id, el) => {
+        document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+        document.querySelectorAll('.hero-card').forEach(c => c.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        if(el) el.classList.add('active');
+    }
+
+    window.switchSocialTab = (type) => {
+        document.getElementById('tabMatches').style.display = type === 'matches' ? 'block' : 'none';
+        document.getElementById('tabPlayers').style.display = type === 'players' ? 'block' : 'none';
+        document.querySelectorAll('.social-tab').forEach(t => t.classList.remove('active'));
+        event.target.classList.add('active');
+    }
+
+    window.openModal = (id) => document.getElementById(id).style.display = 'flex';
+    window.closeModals = () => document.querySelectorAll('.modal-overlay').forEach(m => m.style.display = 'none');
+
+    // --- منطق الحجز ---
+    window.loadStadiumData = async () => {
+        const id = document.getElementById('stadiumSelect').value;
+        if(!id) return;
+        const snap = await getDoc(doc(db, "stadiums", id));
+        selectedStadium = {id: snap.id, ...snap.data()};
+        document.getElementById('priceTag').style.display = 'block';
+        document.getElementById('priceTag').innerText = `${selectedStadium.priceNormal} ريال / ساعة`;
+        loadAvailability();
+    }
+
+    window.loadAvailability = async () => {
+        const date = document.getElementById('bookDate').value;
+        const grid = document.getElementById('timeGrid');
+        if(!date || !selectedStadium) return;
+
+        grid.innerHTML = '...';
+        selectedSlots = [];
+        
+        const q = query(collection(db, "bookings"), where("stadiumName", "==", selectedStadium.name), where("date", "==", date));
+        const snap = await getDocs(q);
+        let booked = [];
+        snap.forEach(d => { if(d.data().bookedSlots) booked.push(...d.data().bookedSlots); });
+
+        grid.innerHTML = '';
+        for(let h=16; h<=26; h++) {
+            const div = document.createElement('div');
+            div.className = 'time-slot' + (booked.includes(h) ? ' booked' : '');
+            let disp = (h%12||12) + ':00';
+            div.innerText = disp;
+            if(!booked.includes(h)) div.onclick = () => {
+                div.classList.toggle('selected');
+                selectedSlots.includes(h) ? selectedSlots = selectedSlots.filter(x=>x!==h) : selectedSlots.push(h);
+            };
+            grid.appendChild(div);
+        }
+    }
+
+    window.submitBooking = async () => {
+        const name = document.getElementById('capName').value;
+        const date = document.getElementById('bookDate').value;
+        if(!name || selectedSlots.length === 0) return alert("أكمل البيانات");
+
+        const total = selectedSlots.length * (selectedStadium.priceNormal || 0);
+
+        await addDoc(collection(db, "bookings"), {
+            clientName: name, stadiumName: selectedStadium.name, date,
+            bookedSlots: selectedSlots, price: total, status: 'pending', createdAt: new Date().toISOString()
+        });
+
+        const msg = `طلب حجز جديد 🆕\n🏟️ ${selectedStadium.name}\n👤 الكابتن: ${name}\n💰 المبلغ: ${total} ريال`;
+        window.open(`https://wa.me/${adminPhone}?text=${encodeURIComponent(msg)}`, '_blank');
+        location.reload();
+    }
+
+    // --- المنطق الاجتماعي ---
+    function listenToSocial() {
+        // 1. طلبات الكباتن (مباريات تنقصها لاعبين)
+        onSnapshot(query(collection(db, "captain_requests"), orderBy("createdAt", "desc")), (snap) => {
+            const list = document.getElementById('captainRequestsList');
+            list.innerHTML = '';
+            snap.forEach(d => {
+                const r = d.data();
+                list.innerHTML += `
+                    <div class="match-card wanted">
+                        <div>
+                            <div style="font-weight:bold;">${r.stadium}</div>
+                            <div style="font-size:11px; color:#64748b;">الكابتن: ${r.captainName} | الوقت: ${r.time}</div>
+                        </div>
+                        <div style="text-align:left;">
+                            <span class="role-tag" style="background:#fee2e2; color:#991b1b;">مطلوب: ${r.positionNeeded}</span>
+                            <button onclick="joinMatch('${r.captainName}')" style="display:block; margin-top:5px; background:var(--primary); color:white; border:none; padding:4px 10px; border-radius:6px; font-size:10px;">انضمام</button>
+                        </div>
+                    </div>`;
+            });
+        });
+
+        // 2. اللاعبين المتاحين
+        onSnapshot(query(collection(db, "available_players"), orderBy("createdAt", "desc")), (snap) => {
+            const list = document.getElementById('availablePlayersList');
+            list.innerHTML = '';
+            snap.forEach(d => {
+                const p = d.data();
+                list.innerHTML += `
+                    <div class="match-card">
+                        <div>
+                            <div style="font-weight:bold;">${p.playerName} (${p.age} سنة)</div>
+                            <div style="font-size:11px; color:#64748b;">جاهز للعب</div>
+                        </div>
+                        <div>
+                            <span class="role-tag">${p.position}</span>
+                            <a href="https://wa.me/${p.phone}" class="role-tag" style="background:var(--primary); color:white; text-decoration:none; margin-right:5px;">تواصل</a>
+                        </div>
+                    </div>`;
+            });
+        });
+    }
+
+    window.postCaptainRequest = async () => {
+        const name = document.getElementById('reqCptName').value;
+        const pos = document.getElementById('reqPos').value;
+        const stad = document.getElementById('reqStadium').value;
+        const time = document.getElementById('reqTime').value;
+        if(!name) return;
+        await addDoc(collection(db, "captain_requests"), {captainName: name, positionNeeded: pos, stadium: stad, time, createdAt: new Date()});
         closeModals();
     }
 
-    // 2. اللاعب ينشر نفسه (متاح)
     window.postPlayerAvailability = async () => {
         const name = document.getElementById('plName').value;
+        const age = document.getElementById('plAge').value;
         const pos = document.getElementById('plPos').value;
         const phone = document.getElementById('plPhone').value;
-
-        if(!name || !pos) return alert("البيانات ناقصة");
-
-        await addDoc(collection(db, "available_players"), {
-            playerName: name, position: pos, phone: phone, createdAt: new Date()
-        });
-        alert("تم النشر! سيراك الكباتن في 'البحث عن لاعبين'");
+        if(!name) return;
+        await addDoc(collection(db, "available_players"), {playerName: name, age, position: pos, phone, createdAt: new Date()});
         closeModals();
     }
-
-    // الاستماع للبيانات (Realtime)
     
-    // أ: عرض اللاعبين المتاحين (للكباتن)
-    onSnapshot(query(collection(db, "available_players"), orderBy("createdAt", "desc")), (snap) => {
-        const list = document.getElementById('availablePlayersList');
-        list.innerHTML = '';
-        snap.forEach(d => {
-            const p = d.data();
-            list.innerHTML += `
-                <div class="req-card player">
-                    <div>
-                        <div style="font-weight:bold;">${p.playerName}</div>
-                        <span class="pos-badge">${p.position}</span>
-                    </div>
-                    <a href="https://wa.me/${p.phone}" target="_blank" style="text-decoration:none; background:#10b981; color:white; padding:5px 10px; border-radius:8px; font-size:12px;">واتساب</a>
-                </div>
-            `;
-        });
-    });
+    window.joinMatch = (cpt) => {
+        alert(`تم إرسال طلب انضمام للكابتن ${cpt}`);
+    }
 
-    // ب: عرض طلبات الكباتن (للاعبين)
-    onSnapshot(query(collection(db, "captain_requests"), orderBy("createdAt", "desc")), (snap) => {
-        const list = document.getElementById('captainRequestsList');
-        list.innerHTML = '';
-        snap.forEach(d => {
-            const c = d.data();
-            list.innerHTML += `
-                <div class="req-card match">
-                    <div>
-                        <div style="font-weight:bold;">${c.stadium} <small>(${c.time})</small></div>
-                        <div style="font-size:12px; color:#64748b;">الكابتن: ${c.captainName}</div>
-                        <span class="pos-badge" style="color:#c2410c; background:#fff7ed;">مطلوب: ${c.positionNeeded}</span>
-                    </div>
-                    <button style="background:#3b82f6; color:white; border:none; padding:5px 10px; border-radius:8px; font-size:12px;">انضمام</button>
-                </div>
-            `;
-        });
-    });
-
+    init();
 </script>
 </body>
 </html>
