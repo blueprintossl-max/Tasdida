@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة التحكم - Tasdida</title>
+    <style>
+        body { font-family: Tahoma, sans-serif; background: #f4f6f9; padding: 20px; }
+        .container { max-width: 1000px; margin: 0 auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); display: none; }
+        
+        /* قسم الإعدادات */
+        .settings-box { background: #e3f2fd; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #90caf9; }
+        .settings-box h3 { margin-top: 0; color: #1565c0; }
+        .settings-box input { padding: 10px; width: 250px; border: 1px solid #ccc; border-radius: 5px; }
+        .btn-save { background: #1565c0; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; }
+
+        /* الجدول */
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { padding: 12px; text-align: right; border-bottom: 1px solid #ddd; }
+        th { background-color: #f8f9fa; color: #555; }
+        .btn-delete { background: #ff4d4d; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; }
+
+        /* تسجيل الدخول */
+        #loginScreen { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: #2c3e50; display: flex; align-items: center; justify-content: center; }
+        .login-box { background: white; padding: 30px; border-radius: 10px; text-align: center; width: 300px; }
+        .login-box input { padding: 10px; width: 80%; margin-bottom: 10px; }
+        .login-box button { padding: 10px 20px; background: #25d366; color: white; border: none; width: 100%; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+    <div id="loginScreen">
+        <div class="login-box">
+            <h3>🔐 دخول المدير</h3>
+            <input type="password" id="adminPass" placeholder="كلمة المرور">
+            <button onclick="checkLogin()">دخول</button>
+            <p id="loginError" style="color:red; font-size:12px; margin-top:5px;"></p>
+        </div>
+    </div>
+
+    <div class="container" id="dashboard">
+        <div class="settings-box">
+            <h3>⚙️ إعدادات التواصل</h3>
+            <label>رقم الواتساب لاستقبال الحجوزات:</label><br>
+            <input type="text" id="waNumber" placeholder="مثال: 966500000000">
+            <button class="btn-save" onclick="saveSettings()">حفظ الرقم 💾</button>
+            <p id="saveMsg" style="display:inline; margin-right:10px; font-weight:bold;"></p>
+        </div>
+
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+            <h2>📋 جدول الحجوزات</h2>
+            <button onclick="loadBookings()" style="background:#25d366; color:white; border:none; padding:10px; border-radius:5px; cursor:pointer;">🔄 تحديث</button>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>العميل</th>
+                    <th>الملعب</th>
+                    <th>التاريخ/الوقت</th>
+                    <th>حذف</th>
+                </tr>
+            </thead>
+            <tbody id="bookingsTable"></tbody>
+        </table>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, getDocs, deleteDoc, doc, orderBy, query, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        // 🔴🔴 الصق كود Firebase Config هنا 🔴🔴
+        const firebaseConfig = {
+            // ... الصق الكود الخاص بك هنا ...
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const ADMIN_PASSWORD = "123"; 
+
+        window.checkLogin = function() {
+            if(document.getElementById('adminPass').value === ADMIN_PASSWORD) {
+                document.getElementById('loginScreen').style.display = 'none';
+                document.getElementById('dashboard').style.display = 'block';
+                loadBookings();
+                loadSettings(); // تحميل الرقم المحفوظ
+            } else {
+                document.getElementById('loginError').innerText = "كلمة المرور خاطئة!";
+            }
+        }
+
+        // دالة حفظ الرقم في قاعدة البيانات
+        window.saveSettings = async function() {
+            const num = document.getElementById('waNumber').value;
+            const msg = document.getElementById('saveMsg');
+            if(!num) return alert("اكتب الرقم أولاً");
+
+            try {
+                // حفظ الرقم في مستند اسمه 'config' داخل مجموعة 'settings'
+                await setDoc(doc(db, "settings", "config"), { adminPhone: num });
+                msg.innerText = "✅ تم الحفظ!";
+                msg.style.color = "green";
+                setTimeout(() => msg.innerText = "", 3000);
+            } catch (e) {
+                console.error(e);
+                alert("خطأ في الحفظ");
+            }
+        }
+
+        // دالة جلب الرقم وعرضه في الخانة
+        async function loadSettings() {
+            try {
+                const docSnap = await getDoc(doc(db, "settings", "config"));
+                if (docSnap.exists()) {
+                    document.getElementById('waNumber').value = docSnap.data().adminPhone;
+                }
+            } catch(e) { console.error("Error loading settings", e); }
+        }
+
+        window.loadBookings = async function() {
+            const tableBody = document.getElementById('bookingsTable');
+            tableBody.innerHTML = '<tr><td colspan="4">جاري التحميل...</td></tr>';
+            try {
+                const q = query(collection(db, "bookings"), orderBy("date"), orderBy("time"));
+                const querySnapshot = await getDocs(q);
+                tableBody.innerHTML = '';
+                if(querySnapshot.empty) { tableBody.innerHTML = '<tr><td colspan="4">لا توجد حجوزات</td></tr>'; return; }
+                querySnapshot.forEach((docSnapshot) => {
+                    const data = docSnapshot.data();
+                    tableBody.innerHTML += `
+                        <tr>
+                            <td>${data.clientName}</td>
+                            <td>${data.stadiumName}</td>
+                            <td>${data.date} | ${data.time}</td>
+                            <td><button class="btn-delete" onclick="deleteBooking('${docSnapshot.id}')">حذف 🗑️</button></td>
+                        </tr>`;
+                });
+            } catch (error) { console.error(error); }
+        }
+
+        window.deleteBooking = async function(docId) {
+            if(confirm("حذف الحجز؟")) {
+                await deleteDoc(doc(db, "bookings", docId));
+                loadBookings();
+            }
+        }
+    </script>
+</body>
+</html>
