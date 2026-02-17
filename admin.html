@@ -3,315 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tasdida - حجز ومباريات</title>
-    <style>
-        :root { --primary: #25d366; --secondary: #128c7e; --bg: #f4f7f6; --text: #333; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg); margin: 0; padding: 20px; padding-bottom: 80px; color: var(--text); }
-        .container { max-width: 600px; margin: 0 auto; }
-        
-        /* الرأس */
-        header { text-align: center; margin-bottom: 30px; }
-        header h1 { color: #075e54; margin: 0; font-size: 28px; }
-        header p { color: #666; font-size: 14px; margin-top: 5px; }
-
-        /* البطاقات */
-        .card { background: white; padding: 15px; margin-bottom: 15px; border-radius: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); border: 2px solid transparent; transition: 0.2s; }
-        .stadium-card { cursor: pointer; display: flex; align-items: center; gap: 15px; }
-        .stadium-card:hover { transform: translateY(-2px); }
-        .stadium-card.selected { border-color: var(--primary); background: #e8f5e9; }
-        .stadium-card img { width: 70px; height: 70px; border-radius: 8px; object-fit: cover; background: #eee; }
-        
-        /* المدخلات */
-        .input-group { background: white; padding: 20px; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        label { display: block; margin-bottom: 8px; font-weight: bold; font-size: 0.9em; }
-        input, select { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; margin-bottom: 15px; box-sizing: border-box; outline: none; }
-        input:focus, select:focus { border-color: var(--primary); }
-
-        /* قسم البحث عن لاعبين */
-        .match-card { border-right: 4px solid #ff9800; background: #fff3e0; }
-        .match-info { font-size: 0.9em; margin-bottom: 10px; }
-        .btn-join { background: #ff9800; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; font-weight: bold; width: 100%; }
-
-        /* الزر السفلي */
-        .bottom-bar { position: fixed; bottom: 0; left: 0; right: 0; background: white; padding: 15px; box-shadow: 0 -2px 10px rgba(0,0,0,0.1); text-align: center; z-index: 100; }
-        .btn-main { background: var(--primary); color: white; border: none; padding: 15px 30px; width: 100%; max-width: 600px; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer; }
-        .btn-main:disabled { background: #ccc; cursor: not-allowed; }
-        
-        /* زر التبديل */
-        .tabs { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; }
-        .tab-btn { padding: 10px 20px; border: none; background: #ddd; border-radius: 20px; cursor: pointer; font-weight: bold; }
-        .tab-btn.active { background: var(--primary); color: white; }
-    </style>
-</head>
-<body>
-
-<div class="container">
-    <header>
-        <h1>⚽ تطبيق Tasdida</h1>
-        <p>احجز ملعبك .. أو انضم لفريق!</p>
-    </header>
-
-    <div class="tabs">
-        <button class="tab-btn active" onclick="switchTab('booking')">حجز ملعب 🏟️</button>
-        <button class="tab-btn" onclick="switchTab('matches')">انضم لفريق 🤝</button>
-    </div>
-
-    <div id="bookingSection">
-        <div class="input-group">
-            <label>👤 الاسم الثلاثي:</label>
-            <input type="text" id="clientName" placeholder="محمد عبدالله">
-            
-            <label>📅 تاريخ الحجز:</label>
-            <input type="date" id="bookingDate">
-            
-            <label>⏰ الوقت:</label>
-            <select id="bookingTime">
-                <option value="">-- اختر الوقت --</option>
-                <option value="16:00">4:00 عصراً</option>
-                <option value="17:00">5:00 عصراً</option>
-                <option value="18:00">6:00 مساءً</option>
-                <option value="19:00">7:00 مساءً</option>
-                <option value="20:00">8:00 مساءً</option>
-                <option value="21:00">9:00 مساءً</option>
-                <option value="22:00">10:00 مساءً</option>
-                <option value="23:00">11:00 مساءً</option>
-            </select>
-
-            <div style="margin-top: 15px; padding: 10px; background: #fff3e0; border-radius: 8px;">
-                <label style="display:flex; align-items:center; gap:10px; margin:0; cursor:pointer;">
-                    <input type="checkbox" id="needsPlayers" style="width:20px; margin:0;">
-                    <span>ينقصنا لاعبين (اسمح للآخرين بالانضمام)</span>
-                </label>
-            </div>
-        </div>
-
-        <h3 style="margin-bottom: 10px;">🏟️ اختر الملعب:</h3>
-        <div id="stadiumsList"></div>
-        
-        <div style="height: 80px;"></div> </div>
-
-    <div id="matchesSection" style="display: none;">
-        <h3>🔥 مباريات تبحث عن لاعبين</h3>
-        <div id="matchesList">
-            <p style="text-align:center; color:#777;">جاري البحث عن مباريات...</p>
-        </div>
-    </div>
-</div>
-
-<div class="bottom-bar" id="bottomBar">
-    <button id="bookBtn" class="btn-main" onclick="processBooking()">تأكيد الحجز ✅</button>
-    <div id="statusMsg" style="margin-top:10px; font-weight:bold;"></div>
-</div>
-
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, collection, addDoc, query, where, getDocs, doc, getDoc, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-
-    // 🔴🔴 هام: الصق كود Firebase Config هنا 🔴🔴
-   const firebaseConfig = {
-  apiKey: "AIzaSyAfn2LhKnsVGQmoAK_HexN_6bm2-NICNSY",
-  authDomain: "tasdida.firebaseapp.com",
-  projectId: "tasdida",
-  storageBucket: "tasdida.firebasestorage.app",
-  messagingSenderId: "72604782215",
-  appId: "1:72604782215:web:38a014c331634398d9f222",
-  measurementId: "G-KV88C3MP0X"
-};
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-
-    let adminPhone = ""; 
-    let selectedStadium = null;
-
-    // جلب رقم الهاتف
-    async function fetchAdminPhone() {
-        try {
-            const docSnap = await getDoc(doc(db, "settings", "config"));
-            if (docSnap.exists()) adminPhone = docSnap.data().adminPhone;
-        } catch (error) { console.error(error); }
-    }
-    fetchAdminPhone();
-
-    // الملاعب
-    const stadiums = [
-        { id: 1, name: "ملعب الجوهرة (الشمال)", price: 150, img: "https://images.unsplash.com/photo-1529900748604-07564a03e7a6?w=100" },
-        { id: 2, name: "ملعب الكامب نو (الشرق)", price: 200, img: "https://images.unsplash.com/photo-1459865264687-595d652de67e?w=100" },
-        { id: 3, name: "ملعب الأولمبي (الوسط)", price: 120, img: "https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=100" }
-    ];
-
-    // عرض الملاعب
-    const stContainer = document.getElementById('stadiumsList');
-    stadiums.forEach(stadium => {
-        const div = document.createElement('div');
-        div.className = 'card stadium-card';
-        div.onclick = () => {
-            selectedStadium = stadium;
-            document.querySelectorAll('.stadium-card').forEach(c => c.classList.remove('selected'));
-            div.classList.add('selected');
-        };
-        div.innerHTML = `
-            <img src="${stadium.img}" alt="ملعب">
-            <div style="flex:1">
-                <h3 style="margin:0 0 5px 0;">${stadium.name}</h3>
-                <span style="color:#25d366; font-weight:bold;">${stadium.price} ريال</span>
-            </div>
-        `;
-        stContainer.appendChild(div);
-    });
-
-    // التبديل بين التبويبات
-    window.switchTab = function(tab) {
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        event.target.classList.add('active');
-        
-        if(tab === 'booking') {
-            document.getElementById('bookingSection').style.display = 'block';
-            document.getElementById('matchesSection').style.display = 'none';
-            document.getElementById('bottomBar').style.display = 'block';
-        } else {
-            document.getElementById('bookingSection').style.display = 'none';
-            document.getElementById('matchesSection').style.display = 'block';
-            document.getElementById('bottomBar').style.display = 'none';
-            loadOpenMatches(); // تحميل المباريات الناقصة
-        }
-    }
-
-    // تحميل المباريات التي تحتاج لاعبين
-    async function loadOpenMatches() {
-        const list = document.getElementById('matchesList');
-        list.innerHTML = '<p style="text-align:center">جاري التحميل...</p>';
-        
-        try {
-            // نبحث عن الحجوزات المستقبلية التي تحتاج لاعبين
-            const today = new Date().toISOString().split('T')[0];
-            const q = query(collection(db, "bookings"), 
-                where("needsPlayers", "==", true),
-                where("date", ">=", today),
-                orderBy("date"), orderBy("time")
-            );
-
-            const snapshot = await getDocs(q);
-            list.innerHTML = '';
-            
-            if(snapshot.empty) {
-                list.innerHTML = '<p style="text-align:center">لا توجد مباريات تبحث عن لاعبين حالياً.</p>';
-                return;
-            }
-
-            snapshot.forEach(doc => {
-                const data = doc.data();
-                list.innerHTML += `
-                    <div class="card match-card">
-                        <div class="match-info">
-                            <strong>⚽ ${data.stadiumName}</strong><br>
-                            📅 ${data.date} | ⏰ ${data.time}<br>
-                            👤 المنظم: ${data.clientName}
-                        </div>
-                        <button class="btn-join" onclick="joinMatch('${data.clientName}', '${data.date}', '${data.time}')">ارسل طلب انضمام 💬</button>
-                    </div>
-                `;
-            });
-
-        } catch (e) { console.error(e); list.innerHTML = 'حدث خطأ في التحميل'; }
-    }
-
-    // دالة الانضمام (واتساب)
-    window.joinMatch = function(hostName, date, time) {
-        if(!adminPhone) return alert("رقم التواصل غير متوفر");
-        const msg = `مرحباً، أرغب بالانضمام للمباراة:\nالمنظم: ${hostName}\nالتاريخ: ${date} الساعة ${time}\nهل يوجد مكان؟`;
-        window.open(`https://wa.me/${adminPhone}?text=${encodeURIComponent(msg)}`, '_blank');
-    }
-
-    // معالجة الحجز
-    window.processBooking = async function() {
-        const name = document.getElementById('clientName').value;
-        const date = document.getElementById('bookingDate').value;
-        const time = document.getElementById('bookingTime').value;
-        const needsPlayers = document.getElementById('needsPlayers').checked;
-        const btn = document.getElementById('bookBtn');
-        const msg = document.getElementById('statusMsg');
-
-        if (!adminPhone) return alert("عذراً، النظام قيد الصيانة (الرقم غير مضبوط)");
-        if (!name || !date || !time || !selectedStadium) return alert("أكمل جميع البيانات!");
-
-        btn.disabled = true;
-        btn.innerText = "جاري الحجز...";
-        msg.innerText = "";
-
-        try {
-            // التحقق من التوفر
-            const q = query(collection(db, "bookings"), 
-                where("stadiumId", "==", selectedStadium.id),
-                where("date", "==", date),
-                where("time", "==", time)
-            );
-            
-            if (!(await getDocs(q)).empty) {
-                msg.innerText = "⛔ الوقت محجوز مسبقاً!";
-                msg.style.color = "red";
-                btn.disabled = false;
-                return;
-            }
-
-            // الحفظ
-            await addDoc(collection(db, "bookings"), {
-                clientName: name,
-                stadiumId: selectedStadium.id,
-                stadiumName: selectedStadium.name,
-                date: date,
-                time: time,
-                price: selectedStadium.price,
-                needsPlayers: needsPlayers, // حفظ حالة البحث عن لاعبين
-                paidToOwner: false, // حالة الدفع للمالك (للمحاسبة)
-                createdAt: new Date()
-            });
-
-            msg.innerText = "✅ تم الحجز! جاري التحويل...";
-            msg.style.color = "green";
-            
-            setTimeout(() => {
-                let waMsg = `حجز جديد *${selectedStadium.name}*\n👤 الاسم: ${name}\n📅 ${date} | ⏰ ${time}\n💰 ${selectedStadium.price} ريال`;
-                if(needsPlayers) waMsg += `\n⚠️ *ملاحظة:* فريقي ناقص وأبحث عن لاعبين!`;
-                
-                window.open(`https://wa.me/${adminPhone}?text=${encodeURIComponent(waMsg)}`, '_blank');
-                location.reload();
-            }, 1500);
-
-        } catch (error) {
-            console.error(error);
-            msg.innerText = "خطأ في الاتصال";
-            btn.disabled = false;
-        }
-    }
-</script>
-</body>
-</html><!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لوحة التحكم - Tasdida</title>
+    <title>لوحة المدير - Tasdida</title>
     <style>
         body { font-family: Tahoma, sans-serif; background: #f4f6f9; padding: 20px; }
-        .container { max-width: 1000px; margin: 0 auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); display: none; }
+        .container { max-width: 1100px; margin: 0 auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); display: none; }
         
-        /* قسم الإعدادات */
-        .settings-box { background: #e3f2fd; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #90caf9; }
-        .settings-box h3 { margin-top: 0; color: #1565c0; }
-        .settings-box input { padding: 10px; width: 250px; border: 1px solid #ccc; border-radius: 5px; }
-        .btn-save { background: #1565c0; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; }
-
+        /* الصناديق */
+        .grid-box { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-bottom: 20px; }
+        .box { padding: 15px; border-radius: 8px; border: 1px solid #ddd; }
+        .box h3 { margin-top: 0; font-size: 16px; }
+        .box input { width: 100%; padding: 8px; margin-bottom: 10px; box-sizing: border-box; }
+        .btn-action { width: 100%; padding: 10px; border: none; border-radius: 5px; cursor: pointer; color: white; font-weight: bold; }
+        
         /* الجدول */
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { padding: 12px; text-align: right; border-bottom: 1px solid #ddd; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { padding: 10px; text-align: right; border-bottom: 1px solid #eee; font-size: 14px; }
         th { background-color: #f8f9fa; color: #555; }
-        .btn-delete { background: #ff4d4d; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; }
+        
+        /* الأزرار والحالات */
+        .status-paid { background: #d4edda; color: #155724; padding: 3px 8px; border-radius: 10px; font-size: 12px; }
+        .status-pending { background: #f8d7da; color: #721c24; padding: 3px 8px; border-radius: 10px; font-size: 12px; }
+        .btn-toggle { background: #17a2b8; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 12px; }
+        .btn-delete { background: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 12px; }
 
-        /* تسجيل الدخول */
-        #loginScreen { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: #2c3e50; display: flex; align-items: center; justify-content: center; }
+        /* شاشة الدخول */
+        #loginScreen { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: #2c3e50; display: flex; align-items: center; justify-content: center; z-index: 999; }
         .login-box { background: white; padding: 30px; border-radius: 10px; text-align: center; width: 300px; }
-        .login-box input { padding: 10px; width: 80%; margin-bottom: 10px; }
-        .login-box button { padding: 10px 20px; background: #25d366; color: white; border: none; width: 100%; cursor: pointer; }
+        .login-box input { padding: 12px; width: 100%; margin-bottom: 15px; box-sizing: border-box; }
     </style>
 </head>
 <body>
@@ -319,32 +37,45 @@
     <div id="loginScreen">
         <div class="login-box">
             <h3>🔐 دخول المدير</h3>
-            <input type="password" id="adminPass" placeholder="كلمة المرور">
-            <button onclick="checkLogin()">دخول</button>
-            <p id="loginError" style="color:red; font-size:12px; margin-top:5px;"></p>
+            <p style="font-size:12px; color:#777;">الافتراضي: 123</p>
+            <input type="password" id="adminPassInput" placeholder="كلمة المرور">
+            <button class="btn-action" style="background:#25d366;" onclick="checkLogin()">دخول</button>
+            <p id="loginError" style="color:red; font-size:12px; margin-top:10px;"></p>
         </div>
     </div>
 
     <div class="container" id="dashboard">
-        <div class="settings-box">
-            <h3>⚙️ إعدادات التواصل</h3>
-            <label>رقم الواتساب لاستقبال الحجوزات:</label><br>
-            <input type="text" id="waNumber" placeholder="مثال: 966500000000">
-            <button class="btn-save" onclick="saveSettings()">حفظ الرقم 💾</button>
-            <p id="saveMsg" style="display:inline; margin-right:10px; font-weight:bold;"></p>
+        <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid #eee; padding-bottom:10px; margin-bottom:20px;">
+            <h2 style="margin:0;">⚙️ لوحة التحكم</h2>
+            <button onclick="loadBookings()" style="background:#6c757d; color:white; border:none; padding:8px 15px; border-radius:5px; cursor:pointer;">🔄 تحديث الجدول</button>
         </div>
 
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-            <h2>📋 جدول الحجوزات</h2>
-            <button onclick="loadBookings()" style="background:#25d366; color:white; border:none; padding:10px; border-radius:5px; cursor:pointer;">🔄 تحديث</button>
+        <div class="grid-box">
+            <div class="box" style="background:#e3f2fd; border-color:#90caf9;">
+                <h3 style="color:#1565c0;">📱 رقم الواتساب</h3>
+                <input type="text" id="waNumber" placeholder="مثال: 966500000000">
+                <button class="btn-action" style="background:#1565c0;" onclick="saveSetting('adminPhone', 'waNumber')">حفظ الرقم</button>
+            </div>
+            
+            <div class="box" style="background:#fff3e0; border-color:#ffe0b2;">
+                <h3 style="color:#e65100;">🔑 كلمة المرور</h3>
+                <input type="text" id="newPassword" placeholder="الجديدة">
+                <button class="btn-action" style="background:#e65100;" onclick="saveSetting('adminPassword', 'newPassword')">تحديث كلمة المرور</button>
+            </div>
         </div>
+        
+        <p id="msgBox" style="text-align:center; font-weight:bold; height:20px;"></p>
 
+        <h3>📋 جدول الحجوزات والمحاسبة</h3>
         <table>
             <thead>
                 <tr>
                     <th>العميل</th>
                     <th>الملعب</th>
-                    <th>التاريخ/الوقت</th>
+                    <th>الموعد</th>
+                    <th>السعر</th>
+                    <th>حالة اللاعبين</th>
+                    <th>الدفع للمالك؟</th>
                     <th>حذف</th>
                 </tr>
             </thead>
@@ -354,9 +85,9 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, getDocs, deleteDoc, doc, orderBy, query, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, collection, getDocs, deleteDoc, doc, orderBy, query, setDoc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        // 🔴🔴 الصق كود Firebase Config هنا 🔴🔴
+        // 🔴🔴 هام: الصق كود Firebase Config هنا 🔴🔴
       const firebaseConfig = {
   apiKey: "AIzaSyAfn2LhKnsVGQmoAK_HexN_6bm2-NICNSY",
   authDomain: "tasdida.firebaseapp.com",
@@ -368,75 +99,90 @@
 };
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
-        const ADMIN_PASSWORD = "123"; 
+        let realPassword = "123";
 
-        window.checkLogin = function() {
-            if(document.getElementById('adminPass').value === ADMIN_PASSWORD) {
+        // الدخول
+        window.checkLogin = async function() {
+            const input = document.getElementById('adminPassInput').value;
+            const err = document.getElementById('loginError');
+            
+            try {
+                const snap = await getDoc(doc(db, "settings", "config"));
+                if(snap.exists()) {
+                    if(snap.data().adminPassword) realPassword = snap.data().adminPassword;
+                    if(snap.data().adminPhone) document.getElementById('waNumber').value = snap.data().adminPhone;
+                }
+            } catch(e) { console.log("Login offline check"); }
+
+            if(input === realPassword) {
                 document.getElementById('loginScreen').style.display = 'none';
                 document.getElementById('dashboard').style.display = 'block';
                 loadBookings();
-                loadSettings(); // تحميل الرقم المحفوظ
             } else {
-                document.getElementById('loginError').innerText = "كلمة المرور خاطئة!";
+                err.innerText = "كلمة المرور خاطئة";
             }
         }
 
-        // دالة حفظ الرقم في قاعدة البيانات
-        window.saveSettings = async function() {
-            const num = document.getElementById('waNumber').value;
-            const msg = document.getElementById('saveMsg');
-            if(!num) return alert("اكتب الرقم أولاً");
-
+        // حفظ الإعدادات
+        window.saveSetting = async function(key, elementId) {
+            const val = document.getElementById(elementId).value;
+            if(!val) return alert("الحقل فارغ!");
             try {
-                // حفظ الرقم في مستند اسمه 'config' داخل مجموعة 'settings'
-                await setDoc(doc(db, "settings", "config"), { adminPhone: num });
-                msg.innerText = "✅ تم الحفظ!";
-                msg.style.color = "green";
-                setTimeout(() => msg.innerText = "", 3000);
-            } catch (e) {
-                console.error(e);
-                alert("خطأ في الحفظ");
-            }
+                await setDoc(doc(db, "settings", "config"), { [key]: val }, { merge: true });
+                document.getElementById('msgBox').innerText = "✅ تم الحفظ بنجاح";
+                document.getElementById('msgBox').style.color = "green";
+                if(key === 'adminPassword') realPassword = val;
+            } catch(e) { alert("خطأ في الحفظ"); }
         }
 
-        // دالة جلب الرقم وعرضه في الخانة
-        async function loadSettings() {
-            try {
-                const docSnap = await getDoc(doc(db, "settings", "config"));
-                if (docSnap.exists()) {
-                    document.getElementById('waNumber').value = docSnap.data().adminPhone;
-                }
-            } catch(e) { console.error("Error loading settings", e); }
-        }
-
+        // تحميل الجدول
         window.loadBookings = async function() {
-            const tableBody = document.getElementById('bookingsTable');
-            tableBody.innerHTML = '<tr><td colspan="4">جاري التحميل...</td></tr>';
+            const tbody = document.getElementById('bookingsTable');
+            tbody.innerHTML = '<tr><td colspan="7" style="text-align:center">جاري التحميل...</td></tr>';
+            
             try {
-                const q = query(collection(db, "bookings"), orderBy("date"), orderBy("time"));
-                const querySnapshot = await getDocs(q);
-                tableBody.innerHTML = '';
-                if(querySnapshot.empty) { tableBody.innerHTML = '<tr><td colspan="4">لا توجد حجوزات</td></tr>'; return; }
-                querySnapshot.forEach((docSnapshot) => {
-                    const data = docSnapshot.data();
-                    tableBody.innerHTML += `
+                const q = query(collection(db, "bookings"), orderBy("date", "desc"), orderBy("time"));
+                const snap = await getDocs(q);
+                tbody.innerHTML = '';
+                
+                if(snap.empty) { tbody.innerHTML = '<tr><td colspan="7" style="text-align:center">لا توجد حجوزات</td></tr>'; return; }
+
+                snap.forEach(d => {
+                    const data = d.data();
+                    const isPaid = data.paidToOwner ? true : false;
+                    const needsPlayers = data.needsPlayers ? '<span style="color:orange; font-weight:bold;">يبحث عن فريق</span>' : 'مكتمل';
+                    
+                    tbody.innerHTML += `
                         <tr>
                             <td>${data.clientName}</td>
                             <td>${data.stadiumName}</td>
-                            <td>${data.date} | ${data.time}</td>
-                            <td><button class="btn-delete" onclick="deleteBooking('${docSnapshot.id}')">حذف 🗑️</button></td>
-                        </tr>`;
+                            <td>${data.date}<br>${data.time}</td>
+                            <td>${data.price}</td>
+                            <td>${needsPlayers}</td>
+                            <td>
+                                <span class="${isPaid ? 'status-paid' : 'status-pending'}">${isPaid ? 'تم التحويل' : 'معلق'}</span>
+                                <button class="btn-toggle" onclick="togglePay('${d.id}', ${isPaid})">تغيير</button>
+                            </td>
+                            <td><button class="btn-delete" onclick="del('${d.id}')">🗑️</button></td>
+                        </tr>
+                    `;
                 });
-            } catch (error) { console.error(error); }
+            } catch(e) { console.error(e); }
         }
 
-        window.deleteBooking = async function(docId) {
+        // تبديل حالة الدفع (للمحاسبة)
+        window.togglePay = async function(id, currentStatus) {
+            await updateDoc(doc(db, "bookings", id), { paidToOwner: !currentStatus });
+            loadBookings();
+        }
+
+        // الحذف
+        window.del = async function(id) {
             if(confirm("حذف الحجز؟")) {
-                await deleteDoc(doc(db, "bookings", docId));
+                await deleteDoc(doc(db, "bookings", id));
                 loadBookings();
             }
         }
     </script>
 </body>
 </html>
-
