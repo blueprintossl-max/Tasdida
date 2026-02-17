@@ -2,174 +2,38 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>تسديدة محترف - العارضة - ملاعب وفرق</title>
+    <title>لوحة التحكم | تسديدة محترف</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root { --primary: #198754; --secondary: #3b82f6; --dark: #0f172a; }
-        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #f8fafc; margin: 0; padding: 15px; padding-bottom: 100px; }
-        .container { max-width: 600px; margin: 0 auto; }
-        
-        .tabs { display: flex; gap: 10px; margin-bottom: 20px; }
-        .tab-btn { flex: 1; padding: 15px; border: none; border-radius: 12px; background: white; font-weight: bold; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        .tab-btn.active { background: var(--primary); color: white; }
-        .tab-btn.blue { background: var(--secondary); color: white; }
-
-        .card { background: white; padding: 15px; border-radius: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 15px; }
-        input, select { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; margin-bottom: 10px; box-sizing: border-box; }
-        
-        /* قائمة اللاعبين المتاحين */
-        .player-item { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid #eee; }
-        .pos-badge { background: #e2e8f0; padding: 2px 8px; border-radius: 5px; font-size: 12px; }
-
-        .bottom-bar { position: fixed; bottom: 0; left: 0; right: 0; background: white; padding: 15px; box-shadow: 0 -4px 15px rgba(0,0,0,0.1); display: flex; justify-content: center; }
-        .btn-main { background: var(--dark); color: white; border: none; padding: 15px 40px; border-radius: 10px; font-weight: bold; cursor: pointer; width: 100%; max-width: 500px; }
+        body { font-family: Tahoma, sans-serif; background: #f1f5f9; padding: 20px; text-align: right; }
+        .admin-header { background: #0f172a; color: white; padding: 20px; border-radius: 15px; margin-bottom: 20px; }
+        .admin-header h2 { margin: 0; font-size: 24px; }
+        .admin-header p { margin: 5px 0 0 0; opacity: 0.7; }
+        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; }
+        .stat-card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <header style="text-align:center; margin-bottom:20px;">
-        <h1 style="color:var(--dark);"><i class="fas fa-futbol"></i> تسديدة العارضة</h1>
-    </header>
-
-    <div class="tabs">
-        <button class="tab-btn active" id="tabBooking" onclick="switchSection('booking')">حجز ملعب 🏟️</button>
-        <button class="tab-btn" id="tabSeeking" onclick="switchSection('seeking')">أبحث عن فريق 🙋‍♂️</button>
+    <div class="admin-header">
+        <h2><i class="fas fa-user-shield"></i> لوحة إدارة تسديدة محترف</h2>
+        <p>فرع العارضة</p>
     </div>
 
-    <div id="bookingSection">
-        <div class="card">
-            <label>اختر الملعب في العارضة:</label>
-            <select id="stadiumSelect" onchange="checkPlayersForStadium()">
-                <option value="">-- اختر الملعب --</option>
-                <option value="ملعب بلدية العارضة">ملعب بلدية العارضة (9 ضد 9)</option>
-                <option value="ملعب الرواد">ملعب الرواد (7 ضد 7)</option>
-                <option value="ملعب المشاف">ملعب المشاف (6 ضد 6)</option>
-                <option value="ملعب الجوة">ملعب الجوة (7 ضد 7)</option>
-                <option value="ملعب قايم العارضة">ملعب قايم العارضة (6 ضد 6)</option>
-            </select>
-            
-            <input type="text" id="capName" placeholder="اسم الكابتن">
-            <input type="date" id="bookDate">
-            <input type="number" id="bookHour" placeholder="الساعة (مثال: 16 لـ 4 عصراً)">
+    <div class="stats-grid">
+        <div class="stat-card">
+            <h3 id="rev">0 ريال</h3>
+            <p>إجمالي الدخل</p>
         </div>
-
-        <div id="playersAlert" class="card" style="display:none; background:#fff3e0; border:1px solid #ffe0b2;">
-            <h4 style="margin:0 0 10px 0; color:#e65100;"><i class="fas fa-user-plus"></i> يوجد لاعبون متاحون لهذا الملعب!</h4>
-            <div id="availablePlayersList"></div>
+        <div class="stat-card">
+            <h3 id="count">0</h3>
+            <p>عدد الحجوزات</p>
+        </div>
+        <div class="stat-card">
+            <h3 id="players">0</h3>
+            <p>لاعبين متاحين</p>
         </div>
     </div>
 
-    <div id="seekingSection" style="display:none;">
-        <div class="card">
-            <h3>سجل بياناتك كلاعب متاح:</h3>
-            <input type="text" id="playerName" placeholder="اسمك الثنائي">
-            <input type="number" id="playerAge" placeholder="العمر">
-            <label>مركزك المفضل:</label>
-            <select id="playerPosition">
-                <option value="حارس">🧤 حارس</option>
-                <option value="دفاع">🛡️ دفاع</option>
-                <option value="وسط">⚙️ وسط</option>
-                <option value="هجوم">⚽ هجوم</option>
-            </select>
-            <label>الملعب الذي ترغب باللعب فيه:</label>
-            <select id="targetStadium">
-                <option value="أي ملعب">أي ملعب في العارضة</option>
-                <option value="ملعب بلدية العارضة">ملعب بلدية العارضة</option>
-                <option value="ملعب الرواد">ملعب الرواد</option>
-                <option value="ملعب المشاف">ملعب المشاف</option>
-                <option value="ملعب الجوة">ملعب الجوة</option>
-            </select>
-            <button class="btn-main" style="background:var(--secondary);" onclick="registerPlayer()">نشر طلبي كلاعب متاح ✅</button>
-        </div>
-    </div>
-</div>
-
-<div class="bottom-bar">
-    <button class="btn-main" id="mainActionBtn" onclick="processBooking()">إتمام الحجز وتحويل للواتساب 🚀</button>
-</div>
-
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, collection, addDoc, query, where, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-
-    const firebaseConfig = {
-      apiKey: "AIzaSyAfn2LhKnsVGQmoAK_HexN_6bm2-NICNSY",
-      authDomain: "tasdida.firebaseapp.com",
-      projectId: "tasdida",
-      storageBucket: "tasdida.firebasestorage.app",
-      messagingSenderId: "72604782215",
-      appId: "1:72604782215:web:38a014c331634398d9f222",
-      measurementId: "G-KV88C3MP0X"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-
-    // تبديل الأقسام
-    window.switchSection = function(sect) {
-        document.getElementById('bookingSection').style.display = sect === 'booking' ? 'block' : 'none';
-        document.getElementById('seekingSection').style.display = sect === 'seeking' ? 'block' : 'none';
-        document.getElementById('mainActionBtn').style.display = sect === 'booking' ? 'block' : 'none';
-        document.getElementById('tabBooking').classList.toggle('active', sect === 'booking');
-        document.getElementById('tabSeeking').classList.toggle('active', sect === 'seeking');
-    }
-
-    // تسجيل لاعب متاح
-    window.registerPlayer = async function() {
-        const name = document.getElementById('playerName').value;
-        const age = document.getElementById('playerAge').value;
-        const pos = document.getElementById('playerPosition').value;
-        const stad = document.getElementById('targetStadium').value;
-
-        if(!name || !age) return alert("أكمل بياناتك");
-
-        await addDoc(collection(db, "available_players"), {
-            name, age, pos, stadium: stad, createdAt: new Date()
-        });
-        alert("تم نشر طلبك! سيقوم الكباتن بمراسلتك عند الحجز.");
-        location.reload();
-    }
-
-    // التحقق من وجود لاعبين للملعب المختار
-    window.checkPlayersForStadium = async function() {
-        const stad = document.getElementById('stadiumSelect').value;
-        const listDiv = document.getElementById('availablePlayersList');
-        const alertDiv = document.getElementById('playersAlert');
-
-        if(!stad) { alertDiv.style.display = 'none'; return; }
-
-        const q = query(collection(db, "available_players"), where("stadium", "in", [stad, "أي ملعب"]));
-        const snap = await getDocs(q);
-
-        if(!snap.empty) {
-            alertDiv.style.display = 'block';
-            listDiv.innerHTML = '';
-            snap.forEach(d => {
-                const p = d.data();
-                listDiv.innerHTML += `
-                    <div class="player-item">
-                        <span><strong>${p.name}</strong> (${p.age} سنة)</span>
-                        <span class="pos-badge">${p.pos}</span>
-                        <button onclick="requestPlayer('${p.name}')" style="font-size:11px; padding:2px 5px;">طلب حضور</button>
-                    </div>
-                `;
-            });
-        } else {
-            alertDiv.style.display = 'none';
-        }
-    }
-
-    window.requestPlayer = function(pName) {
-        alert("تم إرسال طلب حضور لـ " + pName + "! سيظهر له تنبيه عند الدخول.");
-    }
-
-    window.processBooking = async function() {
-        // كود الحجز والتحويل للواتساب السابق...
-        alert("جاري تحويلك لتأكيد الحجز...");
-    }
-</script>
-</body>
+    </body>
 </html>
-
