@@ -11,6 +11,7 @@
 </head>
 <body>
 
+  <!-- LAUNCH SCREEN -->
   <div id="launch">
     <div class="stars" id="stars"></div>
     <div class="l-title">TradeAR</div>
@@ -21,12 +22,14 @@
     </div>
     <div class="l-hint">↑ اضغط للبدء</div>
     <div id="jsOk" style="font-size:11px;color:#506888;margin-top:8px">⏳ جاري تحميل المنظومة...</div>
-    <div class="l-ver">v3.0 · Powered by Finnhub + TradingView</div>
+    <div class="l-ver">v4.0 · Powered by Finnhub + Tiingo</div>
     <div id="dbgBtn" style="position:absolute;bottom:60px;right:20px;padding:8px 16px;background:rgba(255,34,68,.15);border:1px solid rgba(255,34,68,.4);color:#FF6688;border-radius:9px;font-size:11px;cursor:pointer;display:none">🔧 تشغيل مباشر</div>
   </div>
 
+  <!-- APP -->
   <div id="app">
 
+    <!-- TOPBAR -->
     <div class="tb">
       <div class="tb-logo">
         <div class="lg">TA</div>
@@ -51,6 +54,7 @@
       </div>
     </div>
 
+    <!-- ICONS GRID -->
     <div class="ig-wrap">
       <div class="ig-title">⚡ أدوات التداول</div>
       <div class="ig" id="iconsGrid">
@@ -103,6 +107,7 @@
       </div>
     </div>
 
+    <!-- MAIN AREA -->
     <div class="main">
       <div class="sec-head" id="secHead">
         <span class="sh-ic" id="shIc">📊</span>
@@ -135,6 +140,7 @@
     </div>
   </div>
 
+  <!-- ANALYSIS MODAL -->
   <div class="mov" id="mov">
     <div class="mbox">
       <div class="mhead">
@@ -163,6 +169,7 @@
     </div>
   </div>
 
+  <!-- OPPORTUNITIES PANEL -->
   <div class="opp-ov" id="oppOv">
     <div class="opp-box">
       <div class="opp-head">
@@ -176,6 +183,7 @@
     </div>
   </div>
 
+  <!-- BEST 5 PANEL -->
   <div class="buy-ov" id="buyOv">
     <div class="buy-box">
       <div class="opp-head">
@@ -189,6 +197,7 @@
     </div>
   </div>
 
+  <!-- SETTINGS MODAL -->
   <div class="set-ov" id="setOv">
     <div class="set-box">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:19px">
@@ -198,12 +207,12 @@
       <div class="set-f">
         <label class="set-l">🔑 مفتاح Finnhub API</label>
         <input class="set-i" id="setFinn" placeholder="d8jrq5...">
-        <div class="set-note">مجاني من finnhub.io — أسعار بتأخير 15 دقيقة + تحليل المحللين</div>
+        <div class="set-note">مجاني من finnhub.io — لجلب تحليلات الخبراء وأهداف السهم</div>
       </div>
       <div class="set-f">
-        <label class="set-l">⚡ مفتاح Polygon.io (للأسعار الفورية)</label>
-        <input class="set-i" id="setPoly" placeholder="اختياري — أسعار حية 100% بدون تأخير">
-        <div class="set-note">أسعار لحظية فورية عبر WebSocket. اتركه فارغاً لاستخدام Finnhub فقط</div>
+        <label class="set-l">⚡ مفتاح Tiingo (للأسعار الفورية)</label>
+        <input class="set-i" id="setTiingo" placeholder="الصق مفتاح Tiingo هنا للحصول على أسعار IEX الحية...">
+        <div class="set-note">أسعار لحظية فورية 100%. اتركه فارغاً لاستخدام Finnhub فقط</div>
       </div>
       <button class="set-save" id="setSave">💾 حفظ والتحقق</button>
     </div>
@@ -211,6 +220,7 @@
 
   <div id="toast"></div>
 
+  <!-- المكون البرمجي الخلفي -->
   <script src="app.js" defer></script>
 </body>
 </html>
