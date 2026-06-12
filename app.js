@@ -51,8 +51,7 @@ function now12() {
 function wait(ms) { return new Promise(function(r){ setTimeout(r, ms); }); }
 function toast(msg) {
   var t = $('toast');
-  t.textContent = msg;
-  t.classList.add('show');
+  t.textContent = msg; t.classList.add('show');
   clearTimeout(t._tm);
   t._tm = setTimeout(function(){ t.classList.remove('show'); }, 3200);
 }
@@ -63,6 +62,30 @@ function fget(path) {
     return r.json();
   });
 }
+
+/* 🚀 محرك الأسعار الذكي (يدعم ما قبل الافتتاح عبر Polygon) */
+function getLivePrice(t) {
+  if (POLY_KEY) {
+    return fetch('https://api.polygon.io/v2/snapshot/locale/us/markets/stocks/tickers/' + t + '?apiKey=' + POLY_KEY)
+      .then(function(r){ return r.json(); })
+      .then(function(res){
+        if (res && res.ticker) {
+          var tk = res.ticker;
+          // سحب آخر صفقة تمت (تشمل ما قبل الافتتاح وما بعد الإغلاق)
+          var current = tk.lastTrade ? tk.lastTrade.p : (tk.day ? tk.day.c : 0);
+          var prev = tk.prevDay ? tk.prevDay.c : current;
+          var chg = current - prev;
+          var dp = prev > 0 ? (chg / prev) * 100 : 0;
+          return { c: current, d: chg, dp: dp, h: (tk.day ? tk.day.h : current), l: (tk.day ? tk.day.l : current) };
+        }
+        throw new Error('Polygon snapshot failed');
+      }).catch(function(){
+        return fget('/quote?symbol=' + t); // العودة لـ Finnhub في حال فشل Polygon
+      });
+  }
+  return fget('/quote?symbol=' + t); // الافتراضي Finnhub
+}
+
 function setTheme(name) {
   document.documentElement.setAttribute('data-theme', name);
   localStorage.setItem('tar_theme', name);
@@ -148,7 +171,7 @@ function computeAnalysis(t, q, rec, tgt, cat) {
 
 /* ════════════ FETCH ONE STOCK DATA ════════════ */
 function fetchFull(t, cat) {
-  return fget('/quote?symbol=' + t).then(function(q){
+  return getLivePrice(t).then(function(q){
     if (!q || !q.c || q.c === 0) throw new Error('no quote');
     var d = D[t] || {};
     d.p = +q.c.toFixed(2);
@@ -304,7 +327,7 @@ function loadSection(cat) {
       chain = chain.then(function(){
         setProg(3 + idx / tickers.length * 42, 'أسعار: ' + batch.join(' · '));
         return Promise.all(batch.map(function(t){
-          return fget('/quote?symbol=' + t).then(function(q){
+          return getLivePrice(t).then(function(q){
             if (q && q.c && q.c !== 0) {
               var d = D[t] || {};
               d.p = +q.c.toFixed(2);
@@ -375,7 +398,7 @@ function startAutoRefresh(tickers) {
       (function(batch){
         chain = chain.then(function(){
           return Promise.all(batch.map(function(t){
-            return fget('/quote?symbol=' + t).then(function(q){
+            return getLivePrice(t).then(function(q){
               if (q && q.c && q.c > 0) applyPx(t, q.c, q.dp, q.d);
             }).catch(function(){});
           })).then(function(){ return wait(320); });
@@ -400,7 +423,7 @@ function refreshNow() {
     (function(batch){
       chain = chain.then(function(){
         return Promise.all(batch.map(function(t){
-          return fget('/quote?symbol=' + t).then(function(q){
+          return getLivePrice(t).then(function(q){
             if (q && q.c && q.c > 0) { applyPx(t, q.c, q.dp, q.d); done++; }
           }).catch(function(){});
         })).then(function(){ return wait(300); });
