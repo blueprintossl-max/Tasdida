@@ -63,7 +63,7 @@ function fget(path) {
   });
 }
 
-/* 🚀 محرك الأسعار الذكي (يدعم ما قبل الافتتاح عبر Tiingo IEX) */
+/* 🚀 محرك الأسعار للقطات السريعة (REST) */
 function getLivePrice(t) {
   if (TIINGO_KEY) {
     return fetch('https://api.tiingo.com/iex/?tickers=' + t + '&token=' + TIINGO_KEY)
@@ -79,10 +79,10 @@ function getLivePrice(t) {
         }
         throw new Error('Tiingo API data missing');
       }).catch(function(){
-        return fget('/quote?symbol=' + t); // العودة لـ Finnhub في حال فشل الاتصال بـ Tiingo
+        return fget('/quote?symbol=' + t);
       });
   }
-  return fget('/quote?symbol=' + t); // الافتراضي Finnhub
+  return fget('/quote?symbol=' + t);
 }
 
 function setTheme(name) {
@@ -267,11 +267,12 @@ function applyPx(t, price, dp, dchg) {
   if (dp !== undefined && dp !== null) d.pct = +(+dp).toFixed(2);
   if (dchg !== undefined && dchg !== null) d.chg = +(+dchg).toFixed(2);
   d.ltime = now12();
+  
   var prEl = $('pr-' + t);
   if (prEl) {
     prEl.textContent = '$' + f2(d.p);
     prEl.classList.remove('up','dn');
-    void prEl.offsetWidth;
+    void prEl.offsetWidth; // Trigger reflow for animation
     if (old && d.p > old) prEl.classList.add('up');
     else if (old && d.p < old) prEl.classList.add('dn');
   }
@@ -378,6 +379,7 @@ function loadSection(cat) {
     setTimeout(function(){ $('prog').style.display = 'none'; }, 900);
     updateOppBadge();
     $('lastRef').textContent = 'آخر تحديث: ' + now12();
+    if (TIINGO_KEY) updateTiingoWS(); // تحديث اشتراك الأرقام الحية
   });
 }
 
@@ -389,8 +391,7 @@ function setProg(p, txt) {
 
 function startAutoRefresh(tickers) {
   clearInterval(autoTimer);
-  // سحب بيانات Tiingo كل 10 ثوانٍ لضمان التحديث المستمر
-  var intervalMs = TIINGO_KEY ? 10000 : 30000;
+  // أصبحت هذه الدالة مجرد صيانة خلفية كل 60 ثانية لأن الاتصال المباشر هو من يغير الأرقام فعلياً
   autoTimer = setInterval(function(){
     var visible = tickers.filter(function(t){ return D[t] && D[t].p && $('c-' + t); });
     if (!visible.length) return;
@@ -409,7 +410,7 @@ function startAutoRefresh(tickers) {
     chain.then(function(){
       $('lastRef').textContent = 'آخر تحديث: ' + now12();
     });
-  }, intervalMs);
+  }, 60000);
 }
 
 function refreshNow() {
@@ -714,7 +715,7 @@ function renderOptions(t, chain) {
   if (call) h += optCardHTML(t, 'CALL', call, spot);
   if (put) h += optCardHTML(t, 'PUT', put, spot);
   if (!call && !put) {
-    h += '<div class="m-load">⚠️ بيانات عقود الأوبشن غير متاحة حالياً لـ ' + t + '<br><span style="font-size:11px">قد يكون السوق مغلقاً أو الخطة لا تشمل هذا السهم.</span></div>';
+    h += '<div class="m-load">⚠️ بيانات عقود الأوبشن غير متاحة حالياً لـ ' + t + '<br><span style="font-size:11px">قد يكون السوق مغلقاً أو الحساب بحاجة لترقية خطة البيانات.</span></div>';
   }
   if (d.sig && (call || put)) {
     var rec = '';
@@ -1062,6 +1063,7 @@ function openWatchlist() {
     setProg(100, '✅ تمت المزامنة كلياً');
     setTimeout(function(){ $('prog').style.display = 'none'; }, 700);
     startAutoRefresh(tickers); $('lastRef').textContent = 'آخر تحديث: ' + now12();
+    if (TIINGO_KEY) updateTiingoWS();
   });
 }
 
@@ -1105,38 +1107,96 @@ function updateMarket() {
 function openSettings() { $('setFinn').value = FINN_KEY; $('setTiingo').value = TIINGO_KEY; $('setOv').classList.add('show'); }
 
 function saveSettings() {
-  var fk = $('setFinn').value.trim(); var tk = $('setTiingo').value.trim();
-  if (!fk) { toast('⚠️ يجب إدخال مفتاح Finnhub الرئيسي.'); return; }
-  var btn = $('setSave'); btn.textContent = '⏳ جاري التحقق البرمجي...'; btn.disabled = true;
+  var fk = $('setFinn').value.trim(); 
+  var tk = $('setTiingo').value.trim();
+  if (!fk) { toast('⚠️ يجب إدخال مفتاح Finnhub الرئيسي للتحليلات.'); return; }
+  
+  var btn = $('setSave'); 
+  btn.textContent = '⏳ جاري إرسال طلب التوثيق...'; 
+  btn.disabled = true;
 
-  fetch(FINN + '/quote?symbol=AAPL&token=' + fk).then(function(r){ return r.json(); }).then(function(q){
-    if (!q || q.c === undefined || q.c === 0) throw new Error('invalid');
+  // التحقق الأمني المزدوج للمفاتيح
+  var pFinn = fetch(FINN + '/quote?symbol=AAPL&token=' + fk).then(function(r){ return r.json(); });
+  var pTiingo = tk ? fetch('https://api.tiingo.com/iex/?tickers=AAPL&token=' + tk).then(function(r){ return r.json(); }) : Promise.resolve(true);
+
+  Promise.all([pFinn, pTiingo]).then(function(res){
+    var qF = res[0];
+    var qT = res[1];
+    
+    if (!qF || qF.c === undefined || qF.c === 0) throw new Error('finn');
+    if (tk && (!Array.isArray(qT) || qT.length === 0 || qT[0].detail)) throw new Error('tiingo');
+
+    // حفظ المفاتيح بعد نجاح التوثيق
     FINN_KEY = fk; localStorage.setItem('tar_finn', fk);
     TIINGO_KEY = tk; localStorage.setItem('tar_tiingo', tk);
-    toast('✅ تم التحقق وتأمين بروتوكول الاتصال بنجاح.');
+    toast('✅ تم الحفظ وتأمين بروتوكول الاتصال بنجاح.');
     $('setOv').classList.remove('show');
     
-    // تشغيل الإشارات بناءً على Tiingo
+    // تشغيل المحرك المباشر
     if (tk) {
-      $('wsBdg').className = 'ws-bdg live';
-      $('wsBdg').textContent = '🟢 Tiingo فوري';
-      toast('⚡ البيانات الفورية IEX تعمل الآن بتحديث مستمر (كل 10 ثوانٍ).');
+      startTiingoWS();
     } else {
-      startFinnWS(); // العودة لربط Finnhub إذا تم تفريغ الخانة
+      startFinnWS();
     }
-  }).catch(function(){
-    toast('❌ كود التوثيق أو المفتاح المدخل غير صالح.');
+  }).catch(function(err){
+    if (err.message === 'tiingo') {
+      toast('❌ مفتاح Tiingo المرفق غير صالح أو منتهي.');
+    } else {
+      toast('❌ مفتاح Finnhub غير صحيح.');
+    }
   }).finally(function(){
     btn.textContent = '💾 حفظ والتحقق'; btn.disabled = false;
   });
 }
 
-function startFinnWS() {
-  if (TIINGO_KEY) { 
-    $('wsBdg').className = 'ws-bdg live'; 
-    $('wsBdg').textContent = '🟢 Tiingo فوري'; 
-    return; 
+/* ════════════ TIINGO IEX WEBSOCKET (0 SECONDS DELAY) ════════════ */
+function startTiingoWS() {
+  if (!TIINGO_KEY) return;
+  try {
+    if (ws) ws.close();
+    ws = new WebSocket('wss://api.tiingo.com/iex');
+    
+    ws.onopen = function(){
+      $('wsBdg').className = 'ws-bdg live';
+      $('wsBdg').textContent = '🟢 Tiingo فوري';
+      toast('⚡ تم تفعيل الاتصال اللحظي الفوري IEX بنجاح!');
+      updateTiingoWS(); // إرسال طلب الاشتراك للأسهم المعروضة
+    };
+    
+    ws.onmessage = function(ev){
+      try {
+        var msg = JSON.parse(ev.data);
+        // التحقق من نوع الرسالة (A تعني تحديث أسعار حقيقي)
+        if (msg.messageType === 'A' && msg.data) {
+          var tk = msg.data[1]; // اسم السهم
+          var px = msg.data[2]; // آخر سعر تم تنفيذه
+          if (tk && px) applyPx(tk, px); // تحديث الشاشة فوراً
+        }
+      } catch(e){}
+    };
+    
+    ws.onclose = function(){ $('wsBdg').className = 'ws-bdg'; $('wsBdg').textContent = '⚪ غير متصل'; };
+    ws.onerror = function(){ $('wsBdg').className = 'ws-bdg'; $('wsBdg').textContent = '⚪ خطأ اتصال'; };
+  } catch(e){}
+}
+
+function updateTiingoWS() {
+  // دالة لتحديث الأسهم المراقبة داخل قناة Tiingo
+  if (ws && ws.readyState === WebSocket.OPEN && TIINGO_KEY) {
+    var tks = Object.keys(D);
+    if (tks.length > 0) {
+      ws.send(JSON.stringify({
+        eventName: 'subscribe',
+        authorization: TIINGO_KEY,
+        eventData: { thresholdLevel: 5, tickers: tks }
+      }));
+    }
   }
+}
+
+/* ════════════ FINNHUB WEBSOCKET (Fallback) ════════════ */
+function startFinnWS() {
+  if (TIINGO_KEY) { startTiingoWS(); return; }
   try {
     if (ws) ws.close();
     ws = new WebSocket('wss://ws.finnhub.io?token=' + FINN_KEY);
@@ -1159,11 +1219,14 @@ function bindAll() {
   $('launchBtn').addEventListener('click', function(){
     var l = $('launch'); l.classList.add('hide'); $('app').classList.add('show');
     setTimeout(function(){ l.style.display = 'none'; }, 650);
-    updateMarket(); setInterval(updateMarket, 60000); startFinnWS(); saveFav();
+    updateMarket(); setInterval(updateMarket, 60000); 
+    if(TIINGO_KEY) startTiingoWS(); else startFinnWS();
+    saveFav();
   });
   $('dbgBtn').addEventListener('click', function(){
     var l = $('launch'); l.classList.add('hide'); $('app').classList.add('show');
-    l.style.display = 'none'; updateMarket(); startFinnWS();
+    l.style.display = 'none'; updateMarket(); 
+    if(TIINGO_KEY) startTiingoWS(); else startFinnWS();
   });
 
   var sectorMap = { 'ic-ai': 'ai', 'ic-tech': 'text', 'ic-cyber': 'cyber', 'ic-spec': 'spec', 'ic-energy': 'energy', 'ic-health': 'health', 'ic-fin': 'fin', 'ic-halal': 'halal' };
