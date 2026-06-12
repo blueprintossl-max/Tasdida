@@ -71,6 +71,7 @@ body {
   position: absolute;
   inset: 0;
   overflow: hidden;
+  pointer-events: none; /* التعديل الجذري لمنع النجوم من إعاقة النقرات */
 }
 .star {
   position: absolute;
@@ -114,6 +115,8 @@ body {
   box-shadow: 0 0 60px rgba(0,207,255,.25), inset 0 0 35px rgba(0,207,255,.05);
   animation: pl 2.5s infinite;
   user-select: none;
+  position: relative; /* إعطاء الزر طبقة أعلى */
+  z-index: 10; /* ضمان ظهور الزر فوق أي عنصر آخر */
 }
 .l-btn:hover {
   transform: scale(1.06);
